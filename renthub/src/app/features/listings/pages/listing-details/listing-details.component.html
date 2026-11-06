@@ -1,0 +1,341 @@
+@if (isLoading()) {
+  <div class="loading-container">
+    <mat-card class="details-skeleton">
+      <div class="skeleton-gallery"></div>
+      <div class="skeleton-text"></div>
+      <div class="skeleton-text short"></div>
+    </mat-card>
+  </div>
+} @else if (!listing()) {
+  <mat-card class="not-found-card">
+    <mat-icon class="large-icon">search_off</mat-icon>
+    <h2>Listing Not Found</h2>
+    <p>This apartment may have been rented or removed by the landlord.</p>
+    <a mat-flat-button color="primary" routerLink="/">Explore Other Listings</a>
+  </mat-card>
+} @else {
+  @let item = listing()!;
+
+  <div class="details-container">
+    <!-- Breadcrumb & Back -->
+    <div class="top-nav">
+      <a mat-button routerLink="/" class="back-link">
+        <mat-icon>arrow_back</mat-icon> Back to Listings
+      </a>
+      <span class="breadcrumb-info">{{ item.address.city }} &gt; {{ item.buildingName }}</span>
+    </div>
+
+    <!-- Main Grid: Left = Gallery + Details; Right = Price & Actions Box -->
+    <div class="details-layout">
+      <div class="details-main">
+        <!-- Photo Gallery with Main View + Thumbnails -->
+        <div class="gallery-wrapper">
+          <div class="main-photo-frame" (click)="openLightbox()">
+            <img
+              [src]="item.photos[activePhotoIndex()] || 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80'"
+              [alt]="item.title"
+              class="main-photo"
+            />
+            <span class="click-hint"><mat-icon inline>zoom_in</mat-icon> Click to expand</span>
+          </div>
+
+          @if (item.photos.length > 1) {
+            <div class="thumbnails-row">
+              @for (photo of item.photos; track photo; let idx = $index) {
+                <button
+                  type="button"
+                  class="thumb-btn"
+                  [class.active]="idx === activePhotoIndex()"
+                  (click)="selectPhoto(idx)"
+                >
+                  <img [src]="photo" [alt]="'Thumbnail ' + (idx + 1)" class="thumb-img" />
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Property Overview Card -->
+        <mat-card class="section-card">
+          <div class="title-header">
+            <span class="prop-badge">{{ item.propertyType }}</span>
+            <h1 class="listing-title">{{ item.title }}</h1>
+            <p class="listing-address">
+              <mat-icon inline>location_on</mat-icon>
+              {{ item.address.street }}, {{ item.address.city }}, {{ item.address.state }} {{ item.address.zip }}
+            </p>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <!-- Specifications Row -->
+          <div class="specs-grid">
+            <div class="spec-cell">
+              <mat-icon>bed</mat-icon>
+              <div class="spec-meta">
+                <span class="spec-label">Bedrooms</span>
+                <span class="spec-val">{{ item.bedrooms }} Bed</span>
+              </div>
+            </div>
+
+            <div class="spec-cell">
+              <mat-icon>square_foot</mat-icon>
+              <div class="spec-meta">
+                <span class="spec-label">Total Area</span>
+                <span class="spec-val">{{ item.squareFeet }} sq ft</span>
+              </div>
+            </div>
+
+            <div class="spec-cell">
+              <mat-icon>timelapse</mat-icon>
+              <div class="spec-meta">
+                <span class="spec-label">Lease Term</span>
+                <span class="spec-val capitalize">{{ item.leaseType }}</span>
+              </div>
+            </div>
+
+            <div class="spec-cell">
+              <mat-icon>chair</mat-icon>
+              <div class="spec-meta">
+                <span class="spec-label">Furnishing</span>
+                <span class="spec-val">{{ item.furnished ? 'Furnished' : 'Unfurnished' }}</span>
+              </div>
+            </div>
+
+            <div class="spec-cell">
+              <mat-icon>restaurant</mat-icon>
+              <div class="spec-meta">
+                <span class="spec-label">Dietary Pref</span>
+                <span class="spec-val">
+                  {{ item.vegetarianOnly === 'yes' ? 'Vegetarians Only' : item.vegetarianOnly === 'no' ? 'Non-Veg Allowed' : 'No Preference' }}
+                </span>
+              </div>
+            </div>
+
+            <div class="spec-cell">
+              <mat-icon>group</mat-icon>
+              <div class="spec-meta">
+                <span class="spec-label">Sharing</span>
+                <span class="spec-val">{{ item.isShared ? 'Shared Property' : 'Entire Property' }}</span>
+              </div>
+            </div>
+          </div>
+        </mat-card>
+
+        <!-- Description Card -->
+        <mat-card class="section-card">
+          <h2 class="card-heading">About This Apartment</h2>
+          <p class="desc-content">{{ item.description }}</p>
+        </mat-card>
+
+        <!-- Amenities Card -->
+        <mat-card class="section-card">
+          <h2 class="card-heading">Amenities & Features</h2>
+          @if (item.amenities.length > 0) {
+            <div class="amenities-chips">
+              @for (amenity of item.amenities; track amenity) {
+                <span class="amenity-chip">
+                  <mat-icon inline>check_circle</mat-icon>
+                  {{ amenity }}
+                </span>
+              }
+            </div>
+          } @else {
+            <p class="no-amenities">No specific amenities listed.</p>
+          }
+        </mat-card>
+
+        <!-- Comments / Questions -->
+        <mat-card class="section-card comments-card">
+          <h2 class="card-heading">Questions & Comments ({{ comments().length }})</h2>
+
+          @if (!isLoggedIn()) {
+            <p class="login-prompt">
+              Please <a [routerLink]="['/login']" [queryParams]="{ returnUrl: '/listings/' + item.id }">Login to comment</a> or ask a question.
+            </p>
+          } @else {
+            <div class="comment-compose">
+              @if (replyTo()) {
+                <div class="replying-to">
+                  Replying to {{ replyTo()!.authorName }}
+                  <button mat-button type="button" (click)="setReplyTo(null)">Cancel</button>
+                </div>
+              }
+              <mat-form-field appearance="outline" class="comment-field">
+                <mat-label>{{ replyTo() ? 'Write a reply' : 'Ask a question or leave a comment' }}</mat-label>
+                <textarea matInput rows="3" [formControl]="commentControl" maxlength="500"></textarea>
+                @if (commentControl.hasError('required') || commentControl.hasError('whitespace')) {
+                  <mat-error>Comment cannot be empty.</mat-error>
+                }
+                @if (commentControl.hasError('maxlength')) {
+                  <mat-error>Comment must be 500 characters or fewer.</mat-error>
+                }
+              </mat-form-field>
+              <button
+                mat-flat-button
+                color="primary"
+                type="button"
+                [disabled]="isPostingComment()"
+                (click)="submitComment()"
+              >
+                {{ isPostingComment() ? 'Posting...' : replyTo() ? 'Post Reply' : 'Post Comment' }}
+              </button>
+            </div>
+          }
+
+          @if (rootComments().length === 0) {
+            <p class="no-amenities">No comments yet. Start the conversation.</p>
+          } @else {
+            <div class="comment-list">
+              @for (comment of rootComments(); track comment.id) {
+                <div class="comment">
+                  <div class="comment-head">
+                    <div class="author-row">
+                      <strong>{{ comment.authorName }}</strong>
+                      @if (comment.authorId === item.ownerId) {
+                        <span class="owner-badge">Owner</span>
+                      }
+                    </div>
+                    <span>{{ comment.createdAt | timeAgo }}</span>
+                  </div>
+                  <p>{{ comment.text }}</p>
+                  <div class="comment-actions">
+                    <button mat-button type="button" (click)="setReplyTo(comment)">Reply</button>
+                    @if (canDeleteComment(comment)) {
+                      <button mat-button color="warn" type="button" (click)="deleteComment(comment)">Delete</button>
+                    }
+                  </div>
+
+                  @for (reply of repliesFor(comment.id); track reply.id) {
+                    <div class="comment reply">
+                      <div class="comment-head">
+                        <div class="author-row">
+                          <strong>{{ reply.authorName }}</strong>
+                          @if (reply.authorId === item.ownerId) {
+                            <span class="owner-badge">Owner</span>
+                          }
+                        </div>
+                        <span>{{ reply.createdAt | timeAgo }}</span>
+                      </div>
+                      <p>{{ reply.text }}</p>
+                      @if (canDeleteComment(reply)) {
+                        <div class="comment-actions">
+                          <button mat-button color="warn" type="button" (click)="deleteComment(reply)">Delete</button>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </mat-card>
+      </div>
+
+      <!-- Right Column: Sidebar Action Card -->
+      <div class="details-sidebar">
+        <mat-card class="action-card">
+          <div class="price-box">
+            <span class="price-val">{{ item.expectedRent | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+            <span class="price-term">
+              {{ item.priceMode === 'utilities-included' ? '/month (utilities included)' : '/month' }}
+            </span>
+            @if (item.negotiable) {
+              <span class="nego-tag">Negotiable</span>
+            }
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <!-- Owner / Contact Box -->
+          <div class="contact-box">
+            <h3 class="contact-title">Landlord & Contact</h3>
+            <p class="contact-line">
+              <mat-icon inline>person</mat-icon>
+              <span><strong>{{ item.contact.name }}</strong> (Owner)</span>
+            </p>
+            <p class="contact-line">
+              <mat-icon inline>phone</mat-icon>
+              <span>{{ item.contact.phone }}</span>
+            </p>
+            <p class="contact-line">
+              <mat-icon inline>email</mat-icon>
+              <span>{{ item.contact.email }}</span>
+            </p>
+            <p class="posted-date">
+              Posted {{ item.createdAt | timeAgo }}
+            </p>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons-group">
+            <button
+              mat-stroked-button
+              type="button"
+              class="fav-btn"
+              [class.is-fav]="isFav()"
+              (click)="toggleFavourite()"
+            >
+              <mat-icon>{{ isFav() ? 'favorite' : 'favorite_border' }}</mat-icon>
+              {{ isFav() ? 'Saved to Favourites' : 'Add to Favourites' }}
+            </button>
+
+            @if (!isOwner()) {
+              <button
+                mat-flat-button
+                color="primary"
+                type="button"
+                class="inquiry-btn"
+                (click)="openInquiryDialog()"
+              >
+                <mat-icon>send</mat-icon>
+                Send Inquiry
+              </button>
+            } @else {
+              <!-- Owner Controls -->
+              <div class="owner-controls">
+                <span class="owner-label">You own this listing</span>
+                <button mat-flat-button color="accent" type="button" (click)="editListing()">
+                  <mat-icon>edit</mat-icon> Edit Listing
+                </button>
+                <button mat-stroked-button color="warn" type="button" (click)="deleteListing()">
+                  <mat-icon>delete</mat-icon> Delete Listing
+                </button>
+              </div>
+            }
+          </div>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fullscreen Lightbox Modal -->
+  @if (isLightboxOpen()) {
+    <div class="lightbox-overlay" (click)="closeLightbox()">
+      <button mat-icon-button type="button" class="close-lightbox" (click)="closeLightbox()">
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <button mat-icon-button type="button" class="lightbox-nav prev" (click)="prevLightboxPhoto($event)">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+
+      <div class="lightbox-img-wrapper" (click)="$event.stopPropagation()">
+        <img
+          [src]="item.photos[activePhotoIndex()]"
+          [alt]="item.title"
+          class="lightbox-img"
+        />
+        <div class="lightbox-counter">
+          Photo {{ activePhotoIndex() + 1 }} of {{ item.photos.length }}
+        </div>
+      </div>
+
+      <button mat-icon-button type="button" class="lightbox-nav next" (click)="nextLightboxPhoto($event)">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+  }
+}

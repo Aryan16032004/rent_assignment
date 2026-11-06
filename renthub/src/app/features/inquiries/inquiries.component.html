@@ -1,0 +1,99 @@
+<div class="inquiries-page">
+  <div class="page-header">
+    <h1>Inquiries</h1>
+    <p>Review and respond to messages about your properties.</p>
+  </div>
+
+  <div class="tabs">
+    <button type="button" [class.active]="activeTab() === 'received'" (click)="activeTab.set('received')">
+      Received ({{ received().length }})
+    </button>
+    <button type="button" [class.active]="activeTab() === 'sent'" (click)="activeTab.set('sent')">
+      Sent ({{ sent().length }})
+    </button>
+  </div>
+
+  <div class="inquiry-layout">
+    <mat-card class="inquiry-list">
+      @if (isLoading()) {
+        <p class="empty">Loading inquiries...</p>
+      } @else if (currentList().length === 0) {
+        <div class="empty">
+          <mat-icon>mark_email_read</mat-icon>
+          <p>No {{ activeTab() }} inquiries yet.</p>
+        </div>
+      } @else {
+        @for (inquiry of currentList(); track inquiry.id) {
+          <button
+            type="button"
+            class="inquiry-row"
+            [class.selected]="selected()?.id === inquiry.id"
+            (click)="selectInquiry(inquiry)"
+          >
+            <div>
+              <strong>{{ inquiry.listingTitle }}</strong>
+              <span>
+                {{ activeTab() === 'received' ? inquiry.fromUserName : inquiry.toUserName }}
+                · {{ inquiry.createdAt | date: 'mediumDate' }}
+              </span>
+            </div>
+            <span class="status" [class]="inquiry.status || 'pending'">{{ inquiry.status || 'pending' }}</span>
+          </button>
+        }
+      }
+    </mat-card>
+
+    <mat-card class="thread">
+      @if (selected(); as inquiry) {
+        <div class="thread-header">
+          <div>
+            <h2>{{ inquiry.listingTitle }}</h2>
+            <p>
+              From {{ inquiry.fromUserName }} to {{ inquiry.toUserName }}
+            </p>
+          </div>
+          @if (isReceiver(inquiry)) {
+            <div class="status-actions">
+              <button mat-stroked-button type="button" (click)="updateStatus(inquiry, 'accepted')">Accept</button>
+              <button mat-stroked-button type="button" (click)="updateStatus(inquiry, 'rejected')">Reject</button>
+              <button mat-button type="button" (click)="updateStatus(inquiry, 'closed')">Close</button>
+            </div>
+          }
+        </div>
+
+        <div class="messages">
+          <div class="message">
+            <span class="sender">{{ inquiry.fromUserName }}</span>
+            <p>{{ inquiry.message }}</p>
+            <span class="time">{{ inquiry.createdAt | date: 'medium' }}</span>
+          </div>
+          @for (message of inquiry.messages ?? []; track message.id) {
+            <div class="message reply">
+              <span class="sender">{{ message.senderName }}</span>
+              <p>{{ message.message }}</p>
+              <span class="time">{{ message.createdAt | date: 'medium' }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="reply-box">
+          <mat-form-field appearance="outline" class="reply-field">
+            <mat-label>Write a reply</mat-label>
+            <textarea matInput rows="3" [formControl]="replyControl"></textarea>
+            @if (replyControl.hasError('required')) {
+              <mat-error>A reply is required.</mat-error>
+            }
+          </mat-form-field>
+          <button mat-flat-button color="primary" type="button" [disabled]="isSending()" (click)="sendReply()">
+            {{ isSending() ? 'Sending...' : 'Send Reply' }}
+          </button>
+        </div>
+      } @else {
+        <div class="empty thread-empty">
+          <mat-icon>forum</mat-icon>
+          <p>Select an inquiry to read the conversation.</p>
+        </div>
+      }
+    </mat-card>
+  </div>
+</div>

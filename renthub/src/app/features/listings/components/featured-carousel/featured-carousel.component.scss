@@ -1,0 +1,249 @@
+.featured-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  @media (min-width: 992px) {
+    flex-direction: row;
+    align-items: stretch;
+  }
+}
+
+.carousel-wrapper {
+  position: relative;
+  width: 100%;
+  height: 340px;
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: #0f172a;
+  outline: none;
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px #0284c7;
+  }
+
+  @media (min-width: 992px) {
+    width: 65%;
+    height: 400px;
+  }
+}
+
+.carousel-slide {
+  position: relative;
+  width: 100%;
+  height: 100%;
+
+  .carousel-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: opacity 0.4s ease;
+  }
+}
+
+.slide-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2.5rem 1.5rem 1.5rem;
+  background: linear-gradient(to top, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0) 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.featured-badge {
+  background-color: #e11d48;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.slide-price {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(255, 255, 255, 0.85);
+  color: #0f172a;
+  backdrop-filter: blur(4px);
+  z-index: 5;
+
+  &.prev {
+    left: 12px;
+  }
+  &.next {
+    right: 12px;
+  }
+
+  &:hover {
+    background-color: #ffffff;
+  }
+}
+
+.dots-container {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 5;
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s ease;
+
+    &.active {
+      width: 24px;
+      border-radius: 5px;
+      background-color: #ffffff;
+    }
+  }
+}
+
+.featured-side-card {
+  width: 100%;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+  @media (min-width: 992px) {
+    width: 35%;
+  }
+
+  .featured-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #0284c7;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+    display: inline-block;
+  }
+
+  .side-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+
+  .side-location {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #64748b;
+    font-size: 0.88rem;
+  }
+}
+
+.side-body {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.side-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+
+  .side-price {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #0284c7;
+  }
+  .side-mode {
+    font-size: 0.85rem;
+    color: #64748b;
+  }
+}
+
+.side-desc {
+  font-size: 0.9rem;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.side-specs {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 8px 0;
+  font-size: 0.85rem;
+  color: #334155;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 8px;
+  }
+}
+
+.side-actions {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .action-btn,
+  .fav-action-btn {
+    width: 100%;
+  }
+
+  .fav-action-btn.is-fav {
+    color: #ef4444;
+  }
+}
+
+/* Dark mode */
+:host-context(body.dark-theme) {
+  .featured-side-card {
+    background: #131b2e;
+    border: 1px solid #1e293b;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+
+    .side-title {
+      color: #f8fafc;
+    }
+
+    .side-location {
+      color: #94a3b8;
+    }
+
+    .side-desc {
+      color: #94a3b8;
+    }
+
+    .side-specs span {
+      background: #0f172a;
+      color: #cbd5e1;
+    }
+  }
+}

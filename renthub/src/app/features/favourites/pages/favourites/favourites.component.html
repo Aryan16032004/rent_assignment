@@ -1,0 +1,26 @@
+<div class="favourites-page">
+  <div class="page-header">
+    <div>
+      <h1>Favourites</h1>
+      <p>Properties you have saved for later.</p>
+    </div>
+    <a mat-stroked-button routerLink="/">Browse listings</a>
+  </div>
+
+  @if (isLoading()) {
+    <mat-card class="empty-state"><mat-icon>hourglass_top</mat-icon><p>Loading favourites...</p></mat-card>
+  } @else if (listings().length === 0) {
+    <mat-card class="empty-state">
+      <mat-icon>favorite_border</mat-icon>
+      <h2>No favourites yet</h2>
+      <p>Tap the heart on any listing to save it here.</p>
+      <a mat-flat-button color="primary" routerLink="/">Explore Apartments</a>
+    </mat-card>
+  } @else {
+    <div class="listings-grid">
+      @for (listing of listings(); track listing.id) {
+        <app-listing-card [listing]="listing" (favouriteToggled)="load()" />
+      }
+    </div>
+  }
+</div>

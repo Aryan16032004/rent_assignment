@@ -1,0 +1,364 @@
+<div class="form-container">
+  <div class="form-header">
+    <h1 class="page-title">{{ isEditMode() ? 'Edit Rental Listing' : 'Post an apartment' }}</h1>
+    <p class="page-subtitle">Fill in the details below to reach thousands of potential tenants.</p>
+  </div>
+
+  <form [formGroup]="form" class="listing-form" novalidate>
+    <!-- Section 1: Choose Apartment / Building -->
+    <mat-card class="form-section-card">
+      <div class="section-title-row">
+        <span class="step-num">1</span>
+        <h3>Choose your Apartment / Building</h3>
+      </div>
+      <div class="form-row-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Property Type</mat-label>
+          <mat-select formControlName="propertyType">
+            @for (pt of propertyTypes; track pt) {
+              <mat-option [value]="pt">{{ pt }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Building / Society Name</mat-label>
+          <input matInput formControlName="buildingName" placeholder="e.g. Skyline Heights" />
+          @if (form.controls.buildingName.invalid && (form.controls.buildingName.touched || form.controls.buildingName.dirty)) {
+            <mat-error>Building name is required (min 2 chars).</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </mat-card>
+
+    <!-- Section 2: Shared Property -->
+    <mat-card class="form-section-card">
+      <div class="section-title-row">
+        <span class="step-num">2</span>
+        <h3>Is this a shared property?</h3>
+      </div>
+      <mat-radio-group formControlName="isShared" class="radio-row">
+        <mat-radio-button [value]="false">No (Entire Place)</mat-radio-button>
+        <mat-radio-button [value]="true">Yes (Shared Apartment/Room)</mat-radio-button>
+      </mat-radio-group>
+    </mat-card>
+
+    <!-- Section 3: Property Location -->
+    <mat-card class="form-section-card" formGroupName="address">
+      <div class="section-title-row">
+        <span class="step-num">3</span>
+        <h3>Property Location</h3>
+      </div>
+      <div class="form-col">
+        <mat-form-field appearance="outline">
+          <mat-label>Street Address</mat-label>
+          <input matInput formControlName="street" placeholder="e.g. 124 Residency Road" />
+          @if (form.controls.address.controls.street.invalid && (form.controls.address.controls.street.touched || form.controls.address.controls.street.dirty)) {
+            <mat-error>Street address is required.</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="form-row-3">
+          <mat-form-field appearance="outline">
+            <mat-label>City</mat-label>
+            <input matInput formControlName="city" placeholder="e.g. Bengaluru" />
+            @if (form.controls.address.controls.city.invalid && (form.controls.address.controls.city.touched || form.controls.address.controls.city.dirty)) {
+              <mat-error>City is required.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>State</mat-label>
+            <input matInput formControlName="state" placeholder="e.g. Karnataka" />
+            @if (form.controls.address.controls.state.invalid && (form.controls.address.controls.state.touched || form.controls.address.controls.state.dirty)) {
+              <mat-error>State is required.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Zip / Postal Code</mat-label>
+            <input matInput formControlName="zip" placeholder="e.g. 560001" />
+            @if (form.controls.address.controls.zip.invalid && (form.controls.address.controls.zip.touched || form.controls.address.controls.zip.dirty)) {
+              <mat-error>Valid Zip/Postal code is required (5-6 digits).</mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </div>
+    </mat-card>
+
+    <!-- Section 4: Property Details -->
+    <mat-card class="form-section-card">
+      <div class="section-title-row">
+        <span class="step-num">4</span>
+        <h3>Property Details</h3>
+      </div>
+      <div class="form-row-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Square Feet (sq ft)</mat-label>
+          <input matInput type="number" formControlName="squareFeet" placeholder="e.g. 1100" min="50" max="100000" />
+          @if (form.controls.squareFeet.invalid && (form.controls.squareFeet.touched || form.controls.squareFeet.dirty)) {
+            <mat-error>Square feet must be between 50 and 100,000 sq ft.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Bedrooms</mat-label>
+          <mat-select formControlName="bedrooms">
+            <mat-option [value]="1">1 Bedroom / Studio</mat-option>
+            <mat-option [value]="2">2 Bedrooms</mat-option>
+            <mat-option [value]="3">3 Bedrooms</mat-option>
+            <mat-option [value]="4">4+ Bedrooms</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="radio-section">
+        <label class="field-label">Stay / Lease Type:</label>
+        <mat-radio-group formControlName="leaseType" class="radio-row">
+          <mat-radio-button value="long-term">Long term (6+ months)</mat-radio-button>
+          <mat-radio-button value="short-term">Short term</mat-radio-button>
+          <mat-radio-button value="both">Both / Flexible</mat-radio-button>
+        </mat-radio-group>
+      </div>
+    </mat-card>
+
+    <!-- Section 5: Expected Rent -->
+    <mat-card class="form-section-card">
+      <div class="section-title-row">
+        <span class="step-num">5</span>
+        <h3>Expected Rent</h3>
+      </div>
+      <div class="form-row-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Expected Rent Amount</mat-label>
+          <span matTextPrefix class="prefix">₹ &nbsp;</span>
+          <input matInput type="number" formControlName="expectedRent" placeholder="1200" min="1" />
+          @if (form.controls.expectedRent.invalid && (form.controls.expectedRent.touched || form.controls.expectedRent.dirty)) {
+            <mat-error>Valid rent amount is required.</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="checkbox-align">
+          <mat-checkbox formControlName="negotiable" color="primary">
+            Price is Negotiable
+          </mat-checkbox>
+        </div>
+      </div>
+
+      <div class="radio-section">
+        <label class="field-label">Price Mode:</label>
+        <mat-radio-group formControlName="priceMode" class="radio-row">
+          <mat-radio-button value="per-month">Per Month</mat-radio-button>
+          <mat-radio-button value="utilities-included">Utilities included in rent</mat-radio-button>
+        </mat-radio-group>
+      </div>
+    </mat-card>
+
+    <!-- Section 6: Furnishing -->
+    <mat-card class="form-section-card">
+      <div class="section-title-row">
+        <span class="step-num">6</span>
+        <h3>Is the room/apartment furnished?</h3>
+      </div>
+      <mat-radio-group formControlName="furnished" class="radio-row">
+        <mat-radio-button [value]="true">Yes (Furnished)</mat-radio-button>
+        <mat-radio-button [value]="false">No (Unfurnished)</mat-radio-button>
+      </mat-radio-group>
+    </mat-card>
+
+    <!-- Section 7: Vegetarian Preference -->
+    <mat-card class="form-section-card">
+      <div class="section-title-row">
+        <span class="step-num">7</span>
+        <h3>Vegetarian Preference</h3>
+      </div>
+      <mat-radio-group formControlName="vegetarianOnly" class="radio-row">
+        <mat-radio-button value="yes">Yes (Vegetarians only)</mat-radio-button>
+        <mat-radio-button value="no">No</mat-radio-button>
+        <mat-radio-button value="no-preference">No preference</mat-radio-button>
+      </mat-radio-group>
+    </mat-card>
+
+    <!-- Section 7b: Listing status -->
+    <mat-card class="form-section-card">
+      <div class="section-title-row">
+        <span class="step-num">8</span>
+        <h3>Listing status</h3>
+      </div>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="published">Published</mat-option>
+          <mat-option value="draft">Draft</mat-option>
+          <mat-option value="pending">Pending approval</mat-option>
+          <mat-option value="rented">Rented</mat-option>
+          <mat-option value="inactive">Inactive</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </mat-card>
+
+    <!-- Section 8: Amenities Included -->
+    <mat-card class="form-section-card">
+      <div class="section-title-row">
+        <span class="step-num">8</span>
+        <h3>Amenities included</h3>
+      </div>
+      <div class="amenities-grid" [formGroup]="amenitiesFormGroup">
+        @for (amenity of allAmenities; track amenity) {
+          <mat-checkbox [formControlName]="amenity" color="primary">
+            {{ amenity }}
+          </mat-checkbox>
+        }
+      </div>
+    </mat-card>
+
+    <!-- Section 9: Description -->
+    <mat-card class="form-section-card">
+      <div class="section-title-row">
+        <span class="step-num">9</span>
+        <h3>Description</h3>
+      </div>
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Title</mat-label>
+        <input matInput formControlName="title" placeholder="e.g. Spacious 2BHK with Balcony in City Center" />
+        <mat-hint align="end">{{ form.controls.title.value.length }} / 100</mat-hint>
+        @if (form.controls.title.invalid && (form.controls.title.touched || form.controls.title.dirty)) {
+          <mat-error>Title must be between 5 and 100 characters.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-100 mt-2">
+        <mat-label>Description</mat-label>
+        <textarea
+          matInput
+          formControlName="description"
+          rows="5"
+          placeholder="Describe your property, proximity to transport, community features..."
+        ></textarea>
+        <mat-hint align="end">{{ descCharCount() }} / 1400</mat-hint>
+        @if (form.controls.description.invalid && (form.controls.description.touched || form.controls.description.dirty)) {
+          <mat-error>Description must be between 30 and 1400 characters.</mat-error>
+        }
+      </mat-form-field>
+    </mat-card>
+
+    <!-- Section 10: Contact details -->
+    <mat-card class="form-section-card" formGroupName="contact">
+      <div class="section-title-row">
+        <span class="step-num">10</span>
+        <h3>Contact details</h3>
+      </div>
+      <div class="form-row-3">
+        <mat-form-field appearance="outline">
+          <mat-label>Contact Name</mat-label>
+          <input matInput formControlName="name" placeholder="Contact person" />
+          @if (form.controls.contact.controls.name.invalid && (form.controls.contact.controls.name.touched || form.controls.contact.controls.name.dirty)) {
+            <mat-error>Contact name is required.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Phone Number</mat-label>
+          <input matInput formControlName="phone" placeholder="+1-555-019-2834" />
+          @if (form.controls.contact.controls.phone.invalid && (form.controls.contact.controls.phone.touched || form.controls.contact.controls.phone.dirty)) {
+            <mat-error>Valid phone number is required.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Email Address</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="owner@domain.com" />
+          @if (form.controls.contact.controls.email.invalid && (form.controls.contact.controls.email.touched || form.controls.contact.controls.email.dirty)) {
+            <mat-error>Valid email address is required.</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </mat-card>
+
+    <!-- Section 11: Photos -->
+    <mat-card class="form-section-card">
+      <div class="section-title-row">
+        <span class="step-num">11</span>
+        <h3>Photos (Max 6 images, up to 2MB each)</h3>
+      </div>
+
+      <div class="upload-area">
+        <input
+          #fileInput
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          multiple
+          (change)="onFilesSelected($event)"
+          class="file-input-hidden"
+          id="photo-upload"
+        />
+        <label for="photo-upload" class="upload-dropzone">
+          <mat-icon class="upload-icon">cloud_upload</mat-icon>
+          <span class="upload-text">Click to choose photos from your device</span>
+          <span class="upload-sub">Supports JPG, PNG, WEBP (Max 6 photos, &le; 2MB each)</span>
+        </label>
+      </div>
+
+      @if (photoError()) {
+        <p class="photo-error-msg" role="alert">{{ photoError() }}</p>
+      }
+
+      <!-- Photo Previews Grid -->
+      @if (photos().length > 0) {
+        <div class="photo-previews-grid">
+          @for (photo of photos(); track photo; let idx = $index) {
+            <div class="preview-item">
+              <img [src]="photo" [alt]="'Photo ' + (idx + 1)" class="preview-thumb" />
+              @if (idx === 0) {
+                <span class="cover-tag">Cover Photo</span>
+              }
+              <button
+                mat-icon-button
+                type="button"
+                class="remove-photo-btn"
+                (click)="removePhoto(idx)"
+                aria-label="Remove photo"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </mat-card>
+
+    <!-- Form Action Buttons -->
+    <div class="form-actions-bar">
+      <button mat-stroked-button type="button" (click)="cancel()">
+        Cancel
+      </button>
+
+      <div class="actions-right">
+        @if (!isEditMode()) {
+          <button
+            mat-stroked-button
+            color="accent"
+            type="button"
+            (click)="preview()"
+            class="preview-btn"
+          >
+            <mat-icon>visibility</mat-icon>
+            Preview
+          </button>
+        }
+
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          (click)="submit()"
+          [disabled]="isSaving()"
+          class="submit-btn"
+        >
+          <mat-icon>{{ isEditMode() ? 'save' : 'publish' }}</mat-icon>
+          {{ isSaving() ? 'Saving...' : isEditMode() ? 'Save Changes' : 'Publish Listing' }}
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

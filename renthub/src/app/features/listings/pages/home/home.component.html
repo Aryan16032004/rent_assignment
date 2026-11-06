@@ -1,0 +1,86 @@
+<div class="home-container">
+  <!-- Top Section: Featured Carousel + Spotlight Card -->
+  <app-featured-carousel
+    [items]="featuredListings()"
+    (favouriteToggled)="refreshListings()"
+  />
+
+  <!-- Filter & Search Panel -->
+  <app-listing-filters
+    [criteria]="currentFilterCriteria()"
+    [totalResults]="pagedResult().total"
+    (filtersChanged)="onFiltersChanged($event)"
+  />
+
+  <!-- All Listings Header & Sorting -->
+  <section class="listings-section" id="listings-section" aria-label="Available rental listings">
+    <div class="section-header">
+      <div class="header-left">
+        <h2 class="section-title">All Listings</h2>
+        <span class="results-badge">Showing {{ pagedResult().items.length }} of {{ pagedResult().total }} properties</span>
+      </div>
+
+      <div class="header-right">
+        <mat-form-field appearance="outline" class="sort-select">
+          <mat-label>Sort By</mat-label>
+          <mat-select [value]="currentSort()" (valueChange)="onSortChanged($event)">
+            @for (opt of sortOptions; track opt.value) {
+              <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Skeleton Loaders -->
+    @if (isLoading()) {
+      <div class="listings-grid">
+        @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+          <div class="skeleton-card">
+            <div class="skeleton-img"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-line line-title"></div>
+              <div class="skeleton-line line-subtitle"></div>
+              <div class="skeleton-line line-price"></div>
+              <div class="skeleton-line line-desc"></div>
+              <div class="skeleton-line line-btn"></div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else if (pagedResult().items.length === 0) {
+      <!-- Empty state -->
+      <mat-card class="empty-state-card">
+        <mat-icon class="empty-icon">apartment</mat-icon>
+        <h3>No Listings Found</h3>
+        <p>We couldn't find any properties matching your current search and filter criteria.</p>
+        <button mat-flat-button color="primary" (click)="onFiltersChanged({})">
+          Reset All Filters
+        </button>
+      </mat-card>
+    } @else {
+      <!-- Listings Grid (Responsive: 1 col mobile, 2 col tablet, 3 col desktop) -->
+      <div class="listings-grid">
+        @for (listing of pagedResult().items; track listing.id) {
+          <app-listing-card
+            [listing]="listing"
+            (favouriteToggled)="refreshListings()"
+          />
+        }
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-wrapper">
+        <mat-paginator
+          [length]="pagedResult().total"
+          [pageSize]="currentPageSize()"
+          [pageIndex]="currentPage() - 1"
+          [pageSizeOptions]="[6, 9, 12]"
+          (page)="onPageChange($event)"
+          aria-label="Select page of listings"
+          showFirstLastButtons
+        />
+      </div>
+    }
+  </section>
+</div>

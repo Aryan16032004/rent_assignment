@@ -1,0 +1,113 @@
+<div class="auth-page-wrapper">
+  <div class="auth-decor-circle circle-1"></div>
+  <div class="auth-decor-circle circle-2"></div>
+
+  <mat-card class="auth-card">
+    <div class="auth-header">
+      <div class="brand-badge">
+        <mat-icon class="brand-icon">apartment</mat-icon>
+      </div>
+      <h1 class="auth-title">Login to RentHub</h1>
+      <p class="auth-subtitle">Sign in to manage your rentals, inquiries & saved listings</p>
+    </div>
+
+    <!-- Quick Demo Accounts -->
+    <div class="demo-accounts-section">
+      <span class="demo-label">Quick Demo Access:</span>
+      <div class="demo-pills">
+        <button
+          type="button"
+          class="demo-pill"
+          (click)="fillDemo('landlord@renthub.com', 'Landlord@123')"
+        >
+          <mat-icon>real_estate_agent</mat-icon>
+          <span>Landlord</span>
+        </button>
+        <button
+          type="button"
+          class="demo-pill"
+          (click)="fillDemo('renter@renthub.com', 'Renter@123')"
+        >
+          <mat-icon>person</mat-icon>
+          <span>Renter</span>
+        </button>
+        <button
+          type="button"
+          class="demo-pill"
+          (click)="fillDemo('host@renthub.com', 'Host@123')"
+        >
+          <mat-icon>hub</mat-icon>
+          <span>Host / Both</span>
+        </button>
+      </div>
+    </div>
+
+    <mat-card-content>
+      <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <mat-form-field appearance="outline" class="auth-field">
+          <mat-label>Email address</mat-label>
+          <mat-icon matPrefix class="field-icon">email</mat-icon>
+          <input
+            matInput
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            placeholder="name@example.com"
+          />
+          @if (form.controls.email.invalid && (form.controls.email.touched || form.controls.email.dirty)) {
+            <mat-error>{{ getEmailErrorMessage() }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="auth-field">
+          <mat-label>Password</mat-label>
+          <mat-icon matPrefix class="field-icon">lock</mat-icon>
+          <input
+            matInput
+            [type]="hidePassword() ? 'password' : 'text'"
+            formControlName="password"
+            autocomplete="current-password"
+            placeholder="••••••••"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'"
+            (click)="togglePasswordVisibility()"
+          >
+            <mat-icon>{{ hidePassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+          @if (form.controls.password.invalid && (form.controls.password.touched || form.controls.password.dirty)) {
+            <mat-error>{{ getPasswordErrorMessage() }}</mat-error>
+          }
+        </mat-form-field>
+
+        @if (submitError()) {
+          <div class="submit-error submit-error-box" role="alert">
+            <mat-icon>error_outline</mat-icon>
+            <span>{{ submitError() }}</span>
+          </div>
+        }
+
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          class="submit-btn"
+          [disabled]="isSubmitDisabled()"
+        >
+          <span>{{ isSubmitting() ? 'Signing in...' : 'Login' }}</span>
+          <mat-icon iconPositionEnd [class.spinning-icon]="isSubmitting()">
+            {{ isSubmitting() ? 'sync' : 'arrow_forward' }}
+          </mat-icon>
+        </button>
+      </form>
+    </mat-card-content>
+
+    <div class="auth-footer">
+      <span>Don't have an account yet?</span>
+      <a routerLink="/register" class="auth-link">Create Account</a>
+    </div>
+  </mat-card>
+</div>

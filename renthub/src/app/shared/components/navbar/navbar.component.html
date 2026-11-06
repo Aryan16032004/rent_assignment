@@ -1,0 +1,104 @@
+<header class="navbar-wrapper">
+  <mat-toolbar class="navbar">
+    <a routerLink="/" class="brand" aria-label="RentHub home">
+      <div class="brand-logo-badge">
+        <mat-icon>apartment</mat-icon>
+      </div>
+      <span class="brand-text">Rent<span class="brand-accent">Hub</span></span>
+    </a>
+
+    <div class="spacer"></div>
+
+    <div class="desktop-links">
+      <a mat-button routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">
+        <mat-icon class="link-icon">explore</mat-icon>
+        <span>Explore</span>
+      </a>
+
+      @if (isLoggedIn()) {
+        @for (link of userLinks(); track link.path) {
+          @if (link.path === '/listings/new') {
+            <a mat-flat-button color="primary" [routerLink]="link.path" class="post-btn">
+              <mat-icon>add_circle</mat-icon>
+              <span>{{ link.label }}</span>
+            </a>
+          } @else {
+            <a mat-button [routerLink]="link.path" routerLinkActive="active-link">
+              <span>{{ link.label }}</span>
+            </a>
+          }
+        }
+
+        <div class="user-pill" [title]="currentUser()?.email">
+          <mat-icon class="user-avatar-icon">account_circle</mat-icon>
+          <span class="user-name">{{ currentUser()?.name }}</span>
+          <span class="user-role-badge">{{ currentUser()?.role }}</span>
+        </div>
+
+        <button mat-stroked-button color="warn" type="button" class="logout-btn" (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Logout</span>
+        </button>
+      } @else {
+        @for (link of guestLinks(); track link.path) {
+          @if (link.path === '/register') {
+            <a mat-flat-button color="primary" [routerLink]="link.path" class="register-cta-btn">
+              <span>{{ link.label }}</span>
+            </a>
+          } @else {
+            <a mat-button [routerLink]="link.path" routerLinkActive="active-link">
+              <span>{{ link.label }}</span>
+            </a>
+          }
+        }
+      }
+
+      <button
+        mat-icon-button
+        type="button"
+        class="theme-toggle-btn"
+        [attr.aria-label]="isDark() ? 'Switch to light theme' : 'Switch to dark theme'"
+        (click)="toggleTheme()"
+      >
+        <mat-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      </button>
+    </div>
+
+    <!-- Mobile view controls -->
+    <div class="mobile-menu">
+      <button
+        mat-icon-button
+        type="button"
+        class="theme-toggle-btn"
+        [attr.aria-label]="isDark() ? 'Switch to light theme' : 'Switch to dark theme'"
+        (click)="toggleTheme()"
+      >
+        <mat-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      </button>
+
+      <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Open navigation menu">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu" class="mobile-nav-menu">
+        <a mat-menu-item routerLink="/">
+          <mat-icon>explore</mat-icon>
+          <span>Explore</span>
+        </a>
+        @if (isLoggedIn()) {
+          @for (link of userLinks(); track link.path) {
+            <a mat-menu-item [routerLink]="link.path">{{ link.label }}</a>
+          }
+          <mat-divider></mat-divider>
+          <button mat-menu-item type="button" (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
+          </button>
+        } @else {
+          @for (link of guestLinks(); track link.path) {
+            <a mat-menu-item [routerLink]="link.path">{{ link.label }}</a>
+          }
+        }
+      </mat-menu>
+    </div>
+  </mat-toolbar>
+</header>

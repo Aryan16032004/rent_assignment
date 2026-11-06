@@ -1,0 +1,479 @@
+.details-container {
+  max-width: 1100px;
+  margin: 0 auto 3rem;
+}
+
+.top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+
+  .back-link {
+    font-weight: 600;
+  }
+
+  .breadcrumb-info {
+    color: #64748b;
+    font-size: 0.85rem;
+  }
+}
+
+.details-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  @media (min-width: 900px) {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.details-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.details-sidebar {
+  width: 100%;
+
+  @media (min-width: 900px) {
+    width: 340px;
+    position: sticky;
+    top: 80px;
+  }
+}
+
+.gallery-wrapper {
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: #0f172a;
+}
+
+.main-photo-frame {
+  position: relative;
+  height: 380px;
+  cursor: pointer;
+  overflow: hidden;
+
+  .main-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover .main-photo {
+    transform: scale(1.03);
+  }
+
+  .click-hint {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #ffffff;
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+.thumbnails-row {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  background-color: #020617;
+  overflow-x: auto;
+
+  .thumb-btn {
+    border: 2px solid transparent;
+    padding: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    height: 60px;
+    width: 80px;
+    flex-shrink: 0;
+    cursor: pointer;
+    background: #1e293b;
+    transition: border-color 0.2s;
+
+    &.active {
+      border-color: #0284c7;
+    }
+
+    .thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+}
+
+.section-card {
+  padding: 1.5rem;
+  border-radius: 14px;
+}
+
+.title-header {
+  margin-bottom: 1.25rem;
+
+  .prop-badge {
+    background-color: #0284c7;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+
+  .listing-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin: 0 0 6px;
+    line-height: 1.3;
+  }
+
+  .listing-address {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #64748b;
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}
+
+.specs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding-top: 1.25rem;
+
+  @media (min-width: 600px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .spec-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    mat-icon {
+      color: #0284c7;
+      font-size: 26px;
+      width: 26px;
+      height: 26px;
+    }
+
+    .spec-meta {
+      display: flex;
+      flex-direction: column;
+
+      .spec-label {
+        font-size: 0.75rem;
+        color: #64748b;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+
+      .spec-val {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #1e293b;
+
+        &.capitalize {
+          text-transform: capitalize;
+        }
+      }
+    }
+  }
+}
+
+.card-heading {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+}
+
+.desc-content {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #334155;
+  white-space: pre-line;
+  margin: 0;
+}
+
+.amenities-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .amenity-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #e0f2fe;
+    color: #0369a1;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+  }
+}
+
+// Sidebar Action Card
+.action-card {
+  padding: 1.5rem;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+  .price-box {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .price-val {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #0284c7;
+    }
+
+    .price-term {
+      font-size: 0.88rem;
+      color: #64748b;
+    }
+
+    .nego-tag {
+      background: #dcfce7;
+      color: #166534;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      width: fit-content;
+      margin-top: 4px;
+    }
+  }
+
+  .contact-box {
+    .contact-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin: 0 0 8px;
+    }
+
+    .contact-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      margin: 4px 0;
+      color: #334155;
+    }
+
+    .posted-date {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin: 8px 0 0;
+    }
+  }
+
+  .action-buttons-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    button {
+      width: 100%;
+      height: 44px;
+    }
+
+    .fav-btn.is-fav {
+      color: #ef4444;
+      border-color: #fca5a5;
+    }
+
+    .owner-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .owner-label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #0284c7;
+        text-align: center;
+      }
+    }
+  }
+}
+
+// Lightbox Modal
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+
+  .close-lightbox {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: #ffffff;
+    z-index: 2001;
+  }
+
+  .lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.15);
+    z-index: 2001;
+
+    &.prev {
+      left: 20px;
+    }
+    &.next {
+      right: 20px;
+    }
+  }
+
+  .lightbox-img-wrapper {
+    max-width: 85vw;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .lightbox-img {
+      max-width: 100%;
+      max-height: 80vh;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .lightbox-counter {
+      color: #ffffff;
+      font-size: 0.9rem;
+      margin-top: 10px;
+    }
+  }
+}
+
+.comments-card {
+  margin-top: 1.25rem;
+}
+
+.login-prompt {
+  background: rgba(2, 132, 199, 0.08);
+  border: 1px dashed rgba(2, 132, 199, 0.35);
+  padding: 1.1rem 1.25rem;
+  border-radius: 12px;
+  color: #334155;
+  font-size: 0.95rem;
+  margin: 0.75rem 0 1rem;
+
+  a {
+    color: #0284c7;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+
+.comment-compose {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.comment-field {
+  width: 100%;
+}
+
+.replying-to {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.comment-list {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.comment {
+  padding: 0.85rem;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.035);
+
+  p {
+    margin: 0.4rem 0;
+    white-space: pre-wrap;
+  }
+
+  &.reply {
+    margin: 0.75rem 0 0 1.5rem;
+    background: var(--mat-sys-primary-container);
+  }
+}
+
+.comment-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+
+  .author-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .owner-badge {
+    display: inline-flex;
+    align-items: center;
+    background: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  span {
+    opacity: 0.6;
+  }
+}
+
+.comment-actions {
+  display: flex;
+  gap: 0.25rem;
+}

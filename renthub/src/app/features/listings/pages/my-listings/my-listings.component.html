@@ -1,0 +1,75 @@
+<div class="my-listings-page">
+  <div class="page-header">
+    <div>
+      <h1>My Listings</h1>
+      <p>Manage your published, draft, rented, and inactive properties.</p>
+    </div>
+    <a mat-flat-button color="primary" routerLink="/listings/new">
+      <mat-icon>add</mat-icon> Post Apartment
+    </a>
+  </div>
+
+  <div class="tabs">
+    @for (tab of tabs; track tab.value) {
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab() === tab.value"
+        (click)="activeTab.set(tab.value)"
+      >
+        {{ tab.label }} ({{ counts()[tab.value] || 0 }})
+      </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="empty-state"><mat-icon>hourglass_top</mat-icon><p>Loading your listings...</p></div>
+  } @else if (filteredListings().length === 0) {
+    <mat-card class="empty-state">
+      <mat-icon>apartment</mat-icon>
+      <h2>No listings here yet</h2>
+      <p>Post your first property to start receiving inquiries.</p>
+      <a mat-flat-button color="primary" routerLink="/listings/new">Post Apartment</a>
+    </mat-card>
+  } @else {
+    <div class="listing-grid">
+      @for (listing of filteredListings(); track listing.id) {
+        <mat-card class="listing-manage-card">
+          <img
+            [src]="listing.photos[0] || 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80'"
+            [alt]="listing.title"
+          />
+          <div class="card-body">
+            <div class="title-row">
+              <h2>{{ listing.title }}</h2>
+              <span class="status-chip" [class]="listing.status || 'published'">
+                {{ listing.status || 'published' }}
+              </span>
+            </div>
+            <p class="location">{{ listing.address.city }}, {{ listing.address.state }}</p>
+            <p class="price">{{ listing.expectedRent | currency: 'INR' : 'symbol' : '1.0-0' }} / month</p>
+            <p class="posted">Updated {{ listing.updatedAt | date: 'mediumDate' }}</p>
+
+            <div class="card-actions">
+              <a mat-stroked-button [routerLink]="['/listings', listing.id]">View</a>
+              <a mat-stroked-button [routerLink]="['/listings', listing.id, 'edit']">Edit</a>
+              @if (listing.status !== 'published') {
+                <button mat-flat-button color="primary" type="button" (click)="updateStatus(listing, 'published')">
+                  Publish
+                </button>
+              }
+              @if (listing.status !== 'rented') {
+                <button mat-stroked-button type="button" (click)="updateStatus(listing, 'rented')">
+                  Mark Rented
+                </button>
+              }
+              <button mat-button color="warn" type="button" (click)="deleteListing(listing)">
+                Delete
+              </button>
+            </div>
+          </div>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

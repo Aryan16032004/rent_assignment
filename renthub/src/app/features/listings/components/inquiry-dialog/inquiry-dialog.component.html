@@ -1,0 +1,40 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon color="primary">mail</mat-icon>
+  Send Inquiry
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <div class="listing-brief">
+    <p class="listing-name"><strong>Property:</strong> {{ data.listing.title }}</p>
+    <p class="owner-name"><strong>Contact:</strong> {{ data.listing.contact.name }} ({{ data.listing.contact.phone }})</p>
+  </div>
+
+  <form [formGroup]="form" class="inquiry-form" novalidate>
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Your Message to Owner</mat-label>
+      <textarea
+        matInput
+        formControlName="message"
+        rows="4"
+        placeholder="Hi, I am interested in renting this apartment. When can I schedule a visit?"
+      ></textarea>
+      <mat-hint align="end">{{ form.controls.message.value.length }} / 500</mat-hint>
+      @if (form.controls.message.invalid && (form.controls.message.touched || form.controls.message.dirty)) {
+        <mat-error>Message must be between 10 and 500 characters.</mat-error>
+      }
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button type="button" (click)="close()" [disabled]="isSending()">Cancel</button>
+  <button
+    mat-flat-button
+    color="primary"
+    type="button"
+    (click)="send()"
+    [disabled]="form.invalid || isSending()"
+  >
+    {{ isSending() ? 'Sending...' : 'Send Inquiry' }}
+  </button>
+</mat-dialog-actions>

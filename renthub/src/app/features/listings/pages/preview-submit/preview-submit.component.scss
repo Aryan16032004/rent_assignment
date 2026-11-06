@@ -1,0 +1,196 @@
+.preview-container {
+  max-width: 900px;
+  margin: 0 auto 3rem;
+}
+
+.preview-banner {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  @media (min-width: 600px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .banner-text {
+    h2 {
+      margin: 0 0 4px;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #166534;
+    }
+    p {
+      margin: 0;
+      color: #15803d;
+      font-size: 0.9rem;
+    }
+  }
+
+  .banner-actions {
+    display: flex;
+    gap: 10px;
+  }
+}
+
+.preview-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.preview-card {
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+}
+
+.preview-tag {
+  display: inline-block;
+  background-color: #0284c7;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.rent-display {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 12px 0;
+
+  .rent-amount {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #0284c7;
+  }
+
+  .rent-unit {
+    color: #64748b;
+    font-size: 0.95rem;
+  }
+
+  .negotiable {
+    background: #dcfce7;
+    color: #166534;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+}
+
+.details-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+
+  .chip-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #f1f5f9;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #334155;
+
+    &.shared-badge {
+      background: #fef3c7;
+      color: #92400e;
+      font-weight: 600;
+    }
+  }
+}
+
+.section-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.description-text {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #334155;
+  white-space: pre-line;
+  margin: 0;
+}
+
+.amenities-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .amenity-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #e0f2fe;
+    color: #0369a1;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 16px;
+  }
+}
+
+.photos-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+
+  @media (min-width: 600px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .photo-cell {
+    position: relative;
+    height: 150px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #e2e8f0;
+
+    .gallery-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .cover-chip {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      background: #0284c7;
+      color: #ffffff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+  }
+}
+
+.contact-details {
+  p {
+    margin: 6px 0;
+    font-size: 0.95rem;
+  }
+}
+
+.bottom-actions-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+}

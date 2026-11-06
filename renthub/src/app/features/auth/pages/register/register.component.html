@@ -1,0 +1,175 @@
+<div class="auth-page-wrapper">
+  <div class="auth-decor-circle circle-1"></div>
+  <div class="auth-decor-circle circle-2"></div>
+
+  <mat-card class="auth-card">
+    <div class="auth-header">
+      <div class="brand-badge">
+        <mat-icon class="brand-icon">add_home</mat-icon>
+      </div>
+      <h1 class="auth-title">Create your RentHub account</h1>
+      <p class="auth-subtitle">Discover dream rentals or list your property to thousands of verified tenants</p>
+    </div>
+
+    <mat-card-content>
+      <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <!-- Role Selector Pills -->
+        <div class="role-selector-group">
+          <label class="role-group-label">I want to:</label>
+          <div class="role-cards">
+            <button
+              type="button"
+              class="role-card"
+              [class.active]="role() === 'renter'"
+              (click)="role.set('renter')"
+            >
+              <mat-icon>search</mat-icon>
+              <span class="role-title">Rent</span>
+              <span class="role-desc">Find a home</span>
+            </button>
+
+            <button
+              type="button"
+              class="role-card"
+              [class.active]="role() === 'landlord'"
+              (click)="role.set('landlord')"
+            >
+              <mat-icon>home_work</mat-icon>
+              <span class="role-title">List</span>
+              <span class="role-desc">Landlord</span>
+            </button>
+
+            <button
+              type="button"
+              class="role-card"
+              [class.active]="role() === 'both'"
+              (click)="role.set('both')"
+            >
+              <mat-icon>swap_horiz</mat-icon>
+              <span class="role-title">Both</span>
+              <span class="role-desc">Rent & List</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Name Field -->
+        <mat-form-field appearance="outline" class="auth-field">
+          <mat-label>Full Name</mat-label>
+          <mat-icon matPrefix class="field-icon">person</mat-icon>
+          <input
+            matInput
+            type="text"
+            formControlName="name"
+            autocomplete="name"
+            placeholder="John Doe"
+          />
+          @if (form.controls.name.invalid && (form.controls.name.touched || form.controls.name.dirty)) {
+            <mat-error>{{ getNameErrorMessage() }}</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Email Field -->
+        <mat-form-field appearance="outline" class="auth-field">
+          <mat-label>Email Address</mat-label>
+          <mat-icon matPrefix class="field-icon">email</mat-icon>
+          <input
+            matInput
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            placeholder="name@example.com"
+          />
+          @if (form.controls.email.pending) {
+            <mat-hint>Checking email availability...</mat-hint>
+          }
+          @if (form.controls.email.invalid && (form.controls.email.touched || form.controls.email.dirty)) {
+            <mat-error>{{ getEmailErrorMessage() }}</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Password Field -->
+        <mat-form-field appearance="outline" class="auth-field">
+          <mat-label>Password</mat-label>
+          <mat-icon matPrefix class="field-icon">lock</mat-icon>
+          <input
+            matInput
+            [type]="hidePassword() ? 'password' : 'text'"
+            formControlName="password"
+            autocomplete="new-password"
+            placeholder="At least 8 chars"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'"
+            (click)="togglePasswordVisibility()"
+          >
+            <mat-icon>{{ hidePassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+          @if (form.controls.password.invalid && (form.controls.password.touched || form.controls.password.dirty)) {
+            <mat-error>{{ getPasswordErrorMessage() }}</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Confirm Password Field -->
+        <mat-form-field appearance="outline" class="auth-field">
+          <mat-label>Confirm Password</mat-label>
+          <mat-icon matPrefix class="field-icon">lock_reset</mat-icon>
+          <input
+            matInput
+            [type]="hideConfirmPassword() ? 'password' : 'text'"
+            formControlName="confirmPassword"
+            autocomplete="new-password"
+            placeholder="Repeat password"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            [attr.aria-label]="hideConfirmPassword() ? 'Show confirm password' : 'Hide confirm password'"
+            (click)="toggleConfirmPasswordVisibility()"
+          >
+            <mat-icon>{{ hideConfirmPassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+          @if (
+            form.controls.confirmPassword.invalid ||
+            (form.hasError('passwordMismatch') && (form.controls.confirmPassword.touched || form.controls.confirmPassword.dirty))
+          ) {
+            <mat-error>{{ getConfirmPasswordErrorMessage() }}</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="password-reqs">
+          <mat-icon class="req-icon">info</mat-icon>
+          <span>Use 8+ characters with at least one uppercase letter, number, and special character.</span>
+        </div>
+
+        @if (submitError()) {
+          <div class="submit-error submit-error-box" role="alert">
+            <mat-icon>error_outline</mat-icon>
+            <span>{{ submitError() }}</span>
+          </div>
+        }
+
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          class="submit-btn"
+          [disabled]="isSubmitDisabled()"
+        >
+          <span>{{ isSubmitting() ? 'Creating account...' : 'Register' }}</span>
+          <mat-icon iconPositionEnd [class.spinning-icon]="isSubmitting()">
+            {{ isSubmitting() ? 'sync' : 'arrow_forward' }}
+          </mat-icon>
+        </button>
+      </form>
+    </mat-card-content>
+
+    <div class="auth-footer">
+      <span>Already have an account?</span>
+      <a routerLink="/login" class="auth-link">Sign In</a>
+    </div>
+  </mat-card>
+</div>

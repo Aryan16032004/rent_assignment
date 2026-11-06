@@ -1,0 +1,156 @@
+@if (draft(); as item) {
+  <div class="preview-container">
+    <div class="preview-banner">
+      <div class="banner-text">
+        <h2>Preview Listing Draft</h2>
+        <p>Review all apartment details below before publishing live.</p>
+      </div>
+
+      <div class="banner-actions">
+        <button mat-stroked-button type="button" (click)="backToEdit()" class="back-btn">
+          <mat-icon>arrow_back</mat-icon>
+          Back to Edit
+        </button>
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          (click)="submitListing()"
+          [disabled]="isSubmitting()"
+          class="publish-btn"
+        >
+          <mat-icon>check_circle</mat-icon>
+          {{ isSubmitting() ? 'Publishing...' : 'Submit & Publish' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Wireframe Preview Cards -->
+    <div class="preview-grid">
+      <!-- 1. Key Specs Card -->
+      <mat-card class="preview-card">
+        <mat-card-header>
+          <span class="preview-tag">{{ item.propertyType }}</span>
+          <mat-card-title>{{ item.title }}</mat-card-title>
+          <mat-card-subtitle>
+            <mat-icon inline>location_on</mat-icon>
+            {{ item.address?.street }}, {{ item.address?.city }}, {{ item.address?.state }} {{ item.address?.zip }}
+          </mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content class="specs-content">
+          <div class="rent-display">
+            <span class="rent-amount">
+              {{ item.expectedRent | currency: 'INR' : 'symbol' : '1.0-0' }}
+            </span>
+            <span class="rent-unit">
+              {{ item.priceMode === 'utilities-included' ? '/month (utilities included)' : '/month' }}
+            </span>
+            @if (item.negotiable) {
+              <span class="badge negotiable">Negotiable</span>
+            }
+          </div>
+
+          <div class="details-chips">
+            <span class="chip-item"><mat-icon inline>bed</mat-icon> {{ item.bedrooms }} Bedrooms</span>
+            <span class="chip-item"><mat-icon inline>square_foot</mat-icon> {{ item.squareFeet }} sq ft</span>
+            <span class="chip-item"><mat-icon inline>timelapse</mat-icon> {{ item.leaseType }}</span>
+            <span class="chip-item">
+              <mat-icon inline>chair</mat-icon> {{ item.furnished ? 'Furnished' : 'Unfurnished' }}
+            </span>
+            <span class="chip-item">
+              <mat-icon inline>restaurant</mat-icon>
+              {{ item.vegetarianOnly === 'yes' ? 'Vegetarian Only' : item.vegetarianOnly === 'no' ? 'Non-Veg Allowed' : 'No Preference' }}
+            </span>
+            @if (item.isShared) {
+              <span class="chip-item shared-badge">Shared Property</span>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- 2. Description Card -->
+      <mat-card class="preview-card">
+        <mat-card-header>
+          <mat-card-title class="section-title">Description</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p class="description-text">{{ item.description }}</p>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- 3. Amenities Card -->
+      <mat-card class="preview-card">
+        <mat-card-header>
+          <mat-card-title class="section-title">Amenities Included</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          @if (item.amenities && item.amenities.length > 0) {
+            <div class="amenities-list">
+              @for (amenity of item.amenities; track amenity) {
+                <span class="amenity-pill">
+                  <mat-icon inline>check</mat-icon>
+                  {{ amenity }}
+                </span>
+              }
+            </div>
+          } @else {
+            <p class="empty-note">No amenities selected.</p>
+          }
+        </mat-card-content>
+      </mat-card>
+
+      <!-- 4. Photos Gallery Grid -->
+      <mat-card class="preview-card">
+        <mat-card-header>
+          <mat-card-title class="section-title">
+            Photos Gallery ({{ item.photos?.length || 0 }} images)
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="photos-gallery">
+            @for (photo of item.photos; track photo; let idx = $index) {
+              <div class="photo-cell">
+                <img [src]="photo" [alt]="'Photo ' + (idx + 1)" class="gallery-img" />
+                @if (idx === 0) {
+                  <span class="cover-chip">Cover Photo</span>
+                }
+              </div>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- 5. Contact Details Card -->
+      <mat-card class="preview-card">
+        <mat-card-header>
+          <mat-card-title class="section-title">Contact Information</mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="contact-details">
+          <p><strong>Name:</strong> {{ item.contact?.name }}</p>
+          <p><strong>Phone:</strong> {{ item.contact?.phone }}</p>
+          <p><strong>Email:</strong> {{ item.contact?.email }}</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Bottom Actions -->
+    <div class="bottom-actions-bar">
+      <button mat-stroked-button type="button" (click)="backToEdit()">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Edit
+      </button>
+
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        (click)="submitListing()"
+        [disabled]="isSubmitting()"
+      >
+        <mat-icon>check_circle</mat-icon>
+        {{ isSubmitting() ? 'Publishing...' : 'Submit & Publish' }}
+      </button>
+    </div>
+  </div>
+}

@@ -1,0 +1,96 @@
+<div class="profile-page">
+  <div class="page-header">
+    <h1>My Profile</h1>
+    <p>Manage your account details and review your RentHub activity.</p>
+  </div>
+
+  @if (user(); as currentUser) {
+    <div class="profile-grid">
+      <mat-card class="identity-card">
+        <div class="avatar">{{ currentUser.name.charAt(0).toUpperCase() }}</div>
+        <h2>{{ currentUser.name }}</h2>
+        <p class="email">{{ currentUser.email }}</p>
+        <span class="role-chip">{{ roleLabel() }}</span>
+        <p class="joined">Member since {{ currentUser.createdAt | date: 'mediumDate' }}</p>
+
+        <div class="stats">
+          <div><strong>{{ dashboard()?.listings?.['total'] ?? 0 }}</strong><span>Listings</span></div>
+          <div><strong>{{ dashboard()?.favourites ?? 0 }}</strong><span>Favourites</span></div>
+          <div><strong>{{ dashboard()?.inquiries?.['received'] ?? 0 }}</strong><span>Inquiries</span></div>
+        </div>
+      </mat-card>
+
+      <div class="forms-column">
+        <mat-card class="form-card">
+          <h2>Account Details</h2>
+          <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+            <mat-form-field appearance="outline">
+              <mat-label>Full name</mat-label>
+              <input matInput formControlName="name" />
+              @if (profileForm.controls.name.hasError('required')) {
+                <mat-error>Name is required.</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Email</mat-label>
+              <input matInput [value]="currentUser.email" disabled />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Phone</mat-label>
+              <input matInput formControlName="phone" placeholder="+91-9876543210" />
+            </mat-form-field>
+
+            <button mat-flat-button color="primary" type="submit" [disabled]="isSaving()">
+              {{ isSaving() ? 'Saving...' : 'Save Changes' }}
+            </button>
+          </form>
+        </mat-card>
+
+        <mat-card class="form-card">
+          <h2>Change Password</h2>
+          <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+            <mat-form-field appearance="outline">
+              <mat-label>Current password</mat-label>
+              <input matInput type="password" formControlName="currentPassword" />
+              @if (passwordForm.controls.currentPassword.hasError('required') && (passwordForm.controls.currentPassword.touched || passwordForm.controls.currentPassword.dirty)) {
+                <mat-error>Current password is required.</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>New password</mat-label>
+              <input matInput type="password" formControlName="newPassword" />
+              @if (passwordForm.controls.newPassword.hasError('required') && (passwordForm.controls.newPassword.touched || passwordForm.controls.newPassword.dirty)) {
+                <mat-error>New password is required.</mat-error>
+              }
+              @if (passwordForm.controls.newPassword.hasError('minlength') || passwordForm.controls.newPassword.hasError('passwordStrength')) {
+                <mat-error>Must be at least 8 chars with an uppercase letter, number, and special character.</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Confirm new password</mat-label>
+              <input matInput type="password" formControlName="confirmPassword" />
+              @if (passwordForm.controls.confirmPassword.hasError('required') && (passwordForm.controls.confirmPassword.touched || passwordForm.controls.confirmPassword.dirty)) {
+                <mat-error>Please confirm your new password.</mat-error>
+              }
+              @if (passwordForm.hasError('passwordMismatch') && (passwordForm.controls.confirmPassword.touched || passwordForm.controls.confirmPassword.dirty)) {
+                <mat-error>Passwords do not match.</mat-error>
+              }
+            </mat-form-field>
+
+            @if (passwordForm.hasError('sameAsCurrent') && passwordForm.controls.newPassword.touched) {
+              <div class="submit-error">New password cannot be the same as your current password.</div>
+            }
+
+            <button mat-stroked-button type="submit" [disabled]="isChangingPassword()">
+              {{ isChangingPassword() ? 'Updating...' : 'Update Password' }}
+            </button>
+          </form>
+        </mat-card>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,67 @@
+<mat-card class="listing-card">
+  <div class="card-media">
+    <img
+      [src]="currentImage()"
+      [alt]="listing().title"
+      loading="lazy"
+      (error)="onImageError()"
+      class="card-img"
+    />
+    <button
+      mat-icon-button
+      type="button"
+      class="fav-btn"
+      [class.active]="isFav()"
+      [attr.aria-label]="isFav() ? 'Remove from favourites' : 'Mark as favourite'"
+      (click)="toggleFavourite($event)"
+    >
+      <mat-icon>{{ isFav() ? 'favorite' : 'favorite_border' }}</mat-icon>
+    </button>
+    <span class="property-tag">{{ listing().propertyType }}</span>
+  </div>
+
+  <mat-card-header>
+    <mat-card-title class="card-title" [title]="listing().title">
+      {{ listing().title }}
+    </mat-card-title>
+    <mat-card-subtitle class="card-location">
+      <mat-icon inline>location_on</mat-icon>
+      {{ listing().address.city }}, {{ listing().address.state }}
+    </mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content class="card-body">
+    <div class="price-row">
+      <span class="price">{{ listing().expectedRent | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+      <span class="price-mode">
+        {{ listing().priceMode === 'utilities-included' ? '/mo (incl. utilities)' : '/month' }}
+      </span>
+      @if (listing().negotiable) {
+        <span class="negotiable-badge">Negotiable</span>
+      }
+    </div>
+
+    <p class="description">
+      {{ listing().description | truncate: 95 }}
+    </p>
+
+    <div class="specs-chips">
+      <span class="spec-item"><mat-icon inline>bed</mat-icon> {{ listing().bedrooms }} Bed</span>
+      <span class="spec-item"><mat-icon inline>square_foot</mat-icon> {{ listing().squareFeet }} sqft</span>
+      @if (listing().furnished) {
+        <span class="spec-item highlight">Furnished</span>
+      }
+    </div>
+  </mat-card-content>
+
+  <mat-card-actions class="card-actions">
+    <a
+      mat-flat-button
+      color="primary"
+      [routerLink]="['/listings', listing().id]"
+      class="details-btn"
+    >
+      View Details
+    </a>
+  </mat-card-actions>
+</mat-card>

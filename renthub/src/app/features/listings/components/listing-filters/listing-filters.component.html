@@ -1,0 +1,162 @@
+<mat-card class="filters-card">
+  <!-- Search bar header -->
+  <div class="search-bar-row">
+    <div class="search-input-wrapper">
+      <mat-icon class="search-icon">search</mat-icon>
+      <input
+        type="text"
+        [formControl]="filterForm.controls.searchTerm"
+        placeholder="Search apartment title, city, street, or description..."
+        class="search-input"
+        aria-label="Search apartments"
+      />
+      @if (filterForm.controls.searchTerm.value) {
+        <button
+          mat-icon-button
+          type="button"
+          (click)="filterForm.controls.searchTerm.setValue('')"
+          aria-label="Clear search query"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </div>
+
+    <button
+      mat-stroked-button
+      type="button"
+      class="filter-toggle-btn"
+      (click)="toggleCollapse()"
+      aria-label="Toggle filters panel"
+    >
+      <mat-icon>{{ isPanelExpanded() ? 'expand_less' : 'tune' }}</mat-icon>
+      Filters {{ activeFilterChips().length > 0 ? '(' + activeFilterChips().length + ')' : '' }}
+    </button>
+  </div>
+
+  <!-- Collapsible filter options -->
+  <div class="filters-body" [class.expanded]="isPanelExpanded()">
+    <form [formGroup]="filterForm" class="filter-form">
+      <div class="filter-grid">
+        <!-- City Select -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>City</mat-label>
+          <mat-select formControlName="city">
+            @for (city of cities; track city) {
+              <mat-option [value]="city">{{ city }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Property Type -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Property Type</mat-label>
+          <mat-select formControlName="propertyType">
+            <mat-option value="all">Any type</mat-option>
+            <mat-option value="Apartment">Apartment</mat-option>
+            <mat-option value="Building">Building</mat-option>
+            <mat-option value="Independent House">Independent House</mat-option>
+            <mat-option value="Room">Room</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Price Range Min / Max -->
+        <div class="price-range-group">
+          <mat-form-field appearance="outline" class="range-field">
+            <mat-label>Min Rent (₹)</mat-label>
+            <input matInput type="number" formControlName="minPrice" placeholder="0" min="0" />
+          </mat-form-field>
+          <span class="range-dash">-</span>
+          <mat-form-field appearance="outline" class="range-field">
+            <mat-label>Max Rent (₹)</mat-label>
+            <input matInput type="number" formControlName="maxPrice" placeholder="100000" min="0" />
+          </mat-form-field>
+        </div>
+
+        <!-- Bedrooms -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Bedrooms</mat-label>
+          <mat-select formControlName="bedrooms">
+            <mat-option [value]="null">Any</mat-option>
+            <mat-option [value]="1">1 BHK / Room</mat-option>
+            <mat-option [value]="2">2 BHK</mat-option>
+            <mat-option [value]="3">3 BHK</mat-option>
+            <mat-option [value]="4">4+ BHK</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Lease Type -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Lease Type</mat-label>
+          <mat-select formControlName="leaseType">
+            <mat-option value="all">Any Stay</mat-option>
+            <mat-option value="long-term">Long-term (6+ mos)</mat-option>
+            <mat-option value="short-term">Short-term</mat-option>
+            <mat-option value="both">Flexible / Both</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Furnished -->
+        <div class="radio-filter-group">
+          <label class="group-label">Furnished:</label>
+          <mat-radio-group formControlName="furnished" class="radio-options">
+            <mat-radio-button value="all">Any</mat-radio-button>
+            <mat-radio-button value="yes">Yes</mat-radio-button>
+            <mat-radio-button value="no">No</mat-radio-button>
+          </mat-radio-group>
+        </div>
+
+        <!-- Vegetarian Preference -->
+        <div class="radio-filter-group">
+          <label class="group-label">Veg Preference:</label>
+          <mat-radio-group formControlName="vegetarianPreference" class="radio-options">
+            <mat-radio-button value="all">Any</mat-radio-button>
+            <mat-radio-button value="yes">Veg Only</mat-radio-button>
+            <mat-radio-button value="no">Non-Veg OK</mat-radio-button>
+          </mat-radio-group>
+        </div>
+      </div>
+
+      <!-- Amenities Checkboxes -->
+      <div class="amenities-section">
+        <label class="group-label">Amenities:</label>
+        <div class="amenities-grid">
+          @for (amenity of allAmenities; track amenity) {
+            <mat-checkbox
+              [checked]="isAmenitySelected(amenity)"
+              (change)="toggleAmenity(amenity)"
+              color="primary"
+              class="amenity-checkbox"
+            >
+              {{ amenity }}
+            </mat-checkbox>
+          }
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Active filter chips and results header -->
+  @if (activeFilterChips().length > 0) {
+    <div class="active-chips-row">
+      <span class="chips-label">Active filters:</span>
+      <mat-chip-set aria-label="Selected filters">
+        @for (chip of activeFilterChips(); track chip.key) {
+          <mat-chip (removed)="removeChip(chip)">
+            {{ chip.label }}
+            <button matChipRemove aria-label="Remove filter">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip>
+        }
+      </mat-chip-set>
+      <button mat-button color="warn" type="button" class="clear-all-btn" (click)="clearAll()">
+        Clear all
+      </button>
+    </div>
+  }
+
+  <div class="results-count-bar">
+    <span class="results-count">{{ totalResults() }} {{ totalResults() === 1 ? 'apartment' : 'apartments' }} found</span>
+  </div>
+</mat-card>

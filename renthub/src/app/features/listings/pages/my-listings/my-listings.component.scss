@@ -1,0 +1,128 @@
+.my-listings-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+
+  h1 {
+    margin: 0 0 0.25rem;
+  }
+
+  p {
+    margin: 0;
+    opacity: 0.75;
+  }
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.tab-btn {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: transparent;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+
+  &.active {
+    background: var(--mat-sys-primary);
+    border-color: var(--mat-sys-primary);
+    color: var(--mat-sys-on-primary);
+  }
+}
+
+.listing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 1rem;
+}
+
+.listing-manage-card {
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+  }
+}
+
+.card-body {
+  padding: 1rem;
+}
+
+.title-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  h2 {
+    font-size: 1.05rem;
+    margin: 0;
+  }
+}
+
+.status-chip {
+  text-transform: capitalize;
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.72rem;
+  background: #e8f5e9;
+
+  &.draft {
+    background: #fff8e1;
+  }
+
+  &.rented {
+    background: #e3f2fd;
+  }
+
+  &.inactive {
+    background: #eceff1;
+  }
+}
+
+.location,
+.posted {
+  margin: 0.35rem 0;
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+.price {
+  font-weight: 700;
+  margin: 0.5rem 0;
+}
+
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.empty-state {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 3rem 1rem;
+
+  mat-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+    opacity: 0.5;
+  }
+}

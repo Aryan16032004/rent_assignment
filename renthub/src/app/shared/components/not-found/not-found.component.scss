@@ -1,0 +1,10 @@
+.not-found-wrapper {
+  min-height: 60vh;
+  display: grid;
+  place-items: center;
+}
+
+mat-card {
+  max-width: 450px;
+  width: 100%;
+}

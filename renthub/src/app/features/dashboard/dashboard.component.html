@@ -1,0 +1,80 @@
+<div class="dashboard-page">
+  <div class="page-header">
+    <div>
+      <h1>Welcome back{{ user() ? ', ' + user()!.name.split(' ')[0] : '' }}</h1>
+      <p>Here is what is happening with your RentHub account.</p>
+    </div>
+    <a mat-flat-button color="primary" routerLink="/listings/new">
+      <mat-icon>add</mat-icon> Post Apartment
+    </a>
+  </div>
+
+  @if (isLoading()) {
+    <mat-card class="loading-card"><mat-icon>hourglass_top</mat-icon> Loading dashboard...</mat-card>
+  } @else if (data(); as dashboard) {
+    <div class="stat-grid">
+      <mat-card class="stat-card">
+        <mat-icon>apartment</mat-icon>
+        <div><strong>{{ dashboard.listings['total'] || 0 }}</strong><span>Total Listings</span></div>
+      </mat-card>
+      <mat-card class="stat-card">
+        <mat-icon>check_circle</mat-icon>
+        <div><strong>{{ dashboard.listings['published'] || 0 }}</strong><span>Published</span></div>
+      </mat-card>
+      <mat-card class="stat-card">
+        <mat-icon>favorite</mat-icon>
+        <div><strong>{{ dashboard.favourites }}</strong><span>Favourites</span></div>
+      </mat-card>
+      <mat-card class="stat-card">
+        <mat-icon>mark_email_unread</mat-icon>
+        <div><strong>{{ dashboard.inquiries['received'] || 0 }}</strong><span>Received Inquiries</span></div>
+      </mat-card>
+      <mat-card class="stat-card">
+        <mat-icon>pending_actions</mat-icon>
+        <div><strong>{{ dashboard.inquiries['pending'] || 0 }}</strong><span>Pending Inquiries</span></div>
+      </mat-card>
+    </div>
+
+    <div class="content-grid">
+      <mat-card class="panel">
+        <div class="panel-header">
+          <h2>Recent Listings</h2>
+          <a mat-button routerLink="/my-listings">View all</a>
+        </div>
+        @if (dashboard.recentListings.length === 0) {
+          <p class="empty">No listings yet.</p>
+        } @else {
+          @for (listing of dashboard.recentListings; track listing.id) {
+            <a class="list-row" [routerLink]="['/listings', listing.id]">
+              <div>
+                <strong>{{ listing.title }}</strong>
+                <span>{{ listing.address.city }} · {{ listing.status || 'published' }}</span>
+              </div>
+              <span class="price">{{ listing.expectedRent | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+            </a>
+          }
+        }
+      </mat-card>
+
+      <mat-card class="panel">
+        <div class="panel-header">
+          <h2>Recent Inquiries</h2>
+          <a mat-button routerLink="/inquiries">View all</a>
+        </div>
+        @if (dashboard.recentInquiries.length === 0) {
+          <p class="empty">No inquiries yet.</p>
+        } @else {
+          @for (inquiry of dashboard.recentInquiries; track inquiry.id) {
+            <a class="list-row" [routerLink]="['/inquiries']">
+              <div>
+                <strong>{{ inquiry.listingTitle }}</strong>
+                <span>{{ inquiry.senderName }} · {{ inquiry.status }}</span>
+              </div>
+              <span class="date">{{ inquiry.createdAt | date: 'shortDate' }}</span>
+            </a>
+          }
+        }
+      </mat-card>
+    </div>
+  }
+</div>

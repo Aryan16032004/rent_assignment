@@ -1,0 +1,120 @@
+@if (items().length > 0 && activeListing()) {
+  <section class="featured-container" aria-label="Featured rental properties">
+    <div
+      class="carousel-wrapper"
+      (mouseenter)="onMouseEnter()"
+      (mouseleave)="onMouseLeave()"
+      (touchstart)="onTouchStart($event)"
+      (touchend)="onTouchEnd($event)"
+      (keydown)="onKeyDown($event)"
+      tabindex="0"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Featured apartments carousel"
+    >
+      <div class="carousel-slide">
+        <img
+          [src]="activeListing()!.photos[0]"
+          [alt]="activeListing()!.title"
+          class="carousel-img"
+        />
+        <div class="slide-overlay">
+          <span class="featured-badge">Featured</span>
+          <span class="slide-price">
+            {{ activeListing()!.expectedRent | currency: 'INR' : 'symbol' : '1.0-0' }} / month
+          </span>
+        </div>
+      </div>
+
+      <button
+        mat-icon-button
+        type="button"
+        class="nav-btn prev"
+        (click)="prevSlide()"
+        aria-label="Previous slide"
+      >
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+
+      <button
+        mat-icon-button
+        type="button"
+        class="nav-btn next"
+        (click)="nextSlide()"
+        aria-label="Next slide"
+      >
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+
+      <div class="dots-container" role="tablist" aria-label="Slides">
+        @for (item of items(); track item.id; let idx = $index) {
+          <button
+            type="button"
+            class="dot"
+            [class.active]="idx === activeIndex()"
+            (click)="goToSlide(idx)"
+            [attr.aria-label]="'Go to slide ' + (idx + 1)"
+            [attr.aria-selected]="idx === activeIndex()"
+            role="tab"
+          ></button>
+        }
+      </div>
+    </div>
+
+    <!-- Right Side Card: Featured info -->
+    <mat-card class="featured-side-card">
+      <mat-card-header>
+        <span class="featured-label">Featured Spotlight</span>
+        <mat-card-title class="side-title">
+          {{ activeListing()!.title }}
+        </mat-card-title>
+        <mat-card-subtitle class="side-location">
+          <mat-icon inline>location_on</mat-icon>
+          {{ activeListing()!.address.city }}, {{ activeListing()!.address.state }}
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content class="side-body">
+        <div class="side-price-row">
+          <span class="side-price">
+            {{ activeListing()!.expectedRent | currency: 'INR' : 'symbol' : '1.0-0' }}
+          </span>
+          <span class="side-mode">
+            {{ activeListing()!.priceMode === 'utilities-included' ? '/month (utilities incl.)' : '/month' }}
+          </span>
+        </div>
+
+        <p class="side-desc">
+          {{ activeListing()!.description | truncate: 120 }}
+        </p>
+
+        <div class="side-specs">
+          <span><mat-icon inline>bed</mat-icon> {{ activeListing()!.bedrooms }} Beds</span>
+          <span><mat-icon inline>square_foot</mat-icon> {{ activeListing()!.squareFeet }} sqft</span>
+          <span><mat-icon inline>apartment</mat-icon> {{ activeListing()!.propertyType }}</span>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions class="side-actions">
+        <a
+          mat-flat-button
+          color="primary"
+          [routerLink]="['/listings', activeListing()!.id]"
+          class="action-btn"
+        >
+          View Details
+        </a>
+        <button
+          mat-stroked-button
+          type="button"
+          (click)="toggleFavourite()"
+          class="fav-action-btn"
+          [class.is-fav]="isFav()"
+        >
+          <mat-icon>{{ isFav() ? 'favorite' : 'favorite_border' }}</mat-icon>
+          {{ isFav() ? 'Favourited' : 'Mark as Favorite' }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </section>
+}
