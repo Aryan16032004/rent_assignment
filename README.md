@@ -96,13 +96,4 @@ npm start
 # Opens at http://localhost:4200
 ```
 
----
 
-## Automated Test Verification
-
-All unit, routing, and journey tests pass:
-
-- **Frontend Tests (`renthub`):** 11 test files, **60 passed, 0 failed**
-- **Frontend Build (`renthub`):** **0 errors**, budget compliant (563 kB initial bundle)
-- **Backend Tests (`backend`):** All passed, 0 errors
-- **Backend Build (`backend`):** Clean TypeScript compilation with 0 errors
