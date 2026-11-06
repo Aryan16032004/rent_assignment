@@ -37,6 +37,7 @@ export class NavbarComponent {
   readonly currentUser = this.authService.currentUser;
   readonly isLoggedIn = this.authService.isLoggedIn;
   readonly isDark = computed(() => this.themeService.currentTheme() === 'dark');
+  readonly canHost = computed(() => this.currentUser()?.role !== 'renter');
 
   readonly guestLinks = computed<NavLink[]>(() => [
     { label: 'Login', path: '/login' },
@@ -44,7 +45,7 @@ export class NavbarComponent {
   ]);
 
   readonly userLinks = computed<NavLink[]>(() => {
-    const canHost = this.currentUser()?.role !== 'renter';
+    const canHost = this.canHost();
     const links: NavLink[] = [{ label: 'Dashboard', path: '/dashboard' }];
     if (canHost) {
       links.push({ label: 'Post Apartment', path: '/listings/new' });

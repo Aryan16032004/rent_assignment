@@ -16,41 +16,99 @@
       </a>
 
       @if (isLoggedIn()) {
-        @for (link of userLinks(); track link.path) {
-          @if (link.path === '/listings/new') {
-            <a mat-flat-button color="primary" [routerLink]="link.path" class="post-btn">
-              <mat-icon>add_circle</mat-icon>
-              <span>{{ link.label }}</span>
-            </a>
-          } @else {
-            <a mat-button [routerLink]="link.path" routerLinkActive="active-link">
-              <span>{{ link.label }}</span>
-            </a>
-          }
+        @if (canHost()) {
+          <a mat-flat-button color="primary" routerLink="/listings/new" class="post-btn">
+            <mat-icon>add_circle</mat-icon>
+            <span>Post Apartment</span>
+          </a>
         }
 
-        <div class="user-pill" [title]="currentUser()?.email">
-          <mat-icon class="user-avatar-icon">account_circle</mat-icon>
+        <a mat-button routerLink="/favourites" routerLinkActive="active-link" class="nav-quick-link">
+          <mat-icon class="link-icon">favorite_border</mat-icon>
+          <span>Favourites</span>
+        </a>
+
+        <a mat-button routerLink="/dashboard" routerLinkActive="active-link" class="nav-dash-link">
+          <mat-icon class="link-icon">dashboard</mat-icon>
+          <span>Dashboard</span>
+        </a>
+
+        <!-- Interactive User Account Pill & Dropdown -->
+        <button
+          mat-button
+          [matMenuTriggerFor]="userProfileMenu"
+          class="user-pill-btn"
+          type="button"
+          aria-label="Open user profile menu"
+        >
+          <div class="user-avatar-badge">
+            <mat-icon>person</mat-icon>
+          </div>
           <span class="user-name">{{ currentUser()?.name }}</span>
           <span class="user-role-badge">{{ currentUser()?.role }}</span>
-        </div>
-
-        <button mat-stroked-button color="warn" type="button" class="logout-btn" (click)="logout()">
-          <mat-icon>logout</mat-icon>
-          <span>Logout</span>
+          <mat-icon class="menu-arrow">expand_more</mat-icon>
         </button>
-      } @else {
-        @for (link of guestLinks(); track link.path) {
-          @if (link.path === '/register') {
-            <a mat-flat-button color="primary" [routerLink]="link.path" class="register-cta-btn">
-              <span>{{ link.label }}</span>
+
+        <!-- User Dropdown Menu -->
+        <mat-menu #userProfileMenu="matMenu" xPosition="before" class="user-profile-menu">
+          <div class="menu-user-header" (click)="$event.stopPropagation()">
+            <div class="menu-user-avatar">
+              <mat-icon>account_circle</mat-icon>
+            </div>
+            <div class="menu-user-info">
+              <span class="menu-user-name">{{ currentUser()?.name }}</span>
+              <span class="menu-user-email">{{ currentUser()?.email }}</span>
+              <span class="menu-role-tag">{{ currentUser()?.role }}</span>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <a mat-menu-item routerLink="/dashboard">
+            <mat-icon>dashboard</mat-icon>
+            <span>Dashboard</span>
+          </a>
+
+          @if (canHost()) {
+            <a mat-menu-item routerLink="/my-listings">
+              <mat-icon>apartment</mat-icon>
+              <span>My Listings</span>
             </a>
-          } @else {
-            <a mat-button [routerLink]="link.path" routerLinkActive="active-link">
-              <span>{{ link.label }}</span>
+            <a mat-menu-item routerLink="/listings/new">
+              <mat-icon>add_circle_outline</mat-icon>
+              <span>Post Apartment</span>
             </a>
           }
-        }
+
+          <a mat-menu-item routerLink="/favourites">
+            <mat-icon>favorite_border</mat-icon>
+            <span>Favourites</span>
+          </a>
+
+          <a mat-menu-item routerLink="/inquiries">
+            <mat-icon>mail_outline</mat-icon>
+            <span>Inquiries</span>
+          </a>
+
+          <a mat-menu-item routerLink="/profile">
+            <mat-icon>person_outline</mat-icon>
+            <span>Profile Settings</span>
+          </a>
+
+          <mat-divider></mat-divider>
+
+          <button mat-menu-item type="button" class="logout-menu-item" (click)="logout()">
+            <mat-icon color="warn">logout</mat-icon>
+            <span class="logout-text">Logout</span>
+          </button>
+        </mat-menu>
+      } @else {
+        <a mat-button routerLink="/login" routerLinkActive="active-link">
+          <span>Login</span>
+        </a>
+        <a mat-flat-button color="primary" routerLink="/register" class="register-cta-btn">
+          <span>Register</span>
+        </a>
       }
 
       <button
@@ -64,7 +122,7 @@
       </button>
     </div>
 
-    <!-- Mobile view controls -->
+    <!-- Mobile view controls (< 992px) -->
     <div class="mobile-menu">
       <button
         mat-icon-button
@@ -76,27 +134,71 @@
         <mat-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
       </button>
 
-      <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Open navigation menu">
+      <button mat-icon-button [matMenuTriggerFor]="mobileNavMenu" aria-label="Open navigation menu" class="mobile-menu-trigger">
         <mat-icon>menu</mat-icon>
       </button>
-      <mat-menu #menu="matMenu" class="mobile-nav-menu">
+
+      <mat-menu #mobileNavMenu="matMenu" class="mobile-nav-menu" xPosition="before">
+        @if (isLoggedIn()) {
+          <div class="mobile-menu-user" (click)="$event.stopPropagation()">
+            <div class="menu-user-avatar">
+              <mat-icon>account_circle</mat-icon>
+            </div>
+            <div class="menu-user-info">
+              <span class="menu-user-name">{{ currentUser()?.name }}</span>
+              <span class="menu-user-email">{{ currentUser()?.email }}</span>
+              <span class="menu-role-tag">{{ currentUser()?.role }}</span>
+            </div>
+          </div>
+          <mat-divider></mat-divider>
+        }
+
         <a mat-menu-item routerLink="/">
           <mat-icon>explore</mat-icon>
           <span>Explore</span>
         </a>
+
         @if (isLoggedIn()) {
-          @for (link of userLinks(); track link.path) {
-            <a mat-menu-item [routerLink]="link.path">{{ link.label }}</a>
+          @if (canHost()) {
+            <a mat-menu-item routerLink="/listings/new" class="mobile-post-item">
+              <mat-icon color="primary">add_circle</mat-icon>
+              <span>Post Apartment</span>
+            </a>
+            <a mat-menu-item routerLink="/my-listings">
+              <mat-icon>apartment</mat-icon>
+              <span>My Listings</span>
+            </a>
           }
+          <a mat-menu-item routerLink="/dashboard">
+            <mat-icon>dashboard</mat-icon>
+            <span>Dashboard</span>
+          </a>
+          <a mat-menu-item routerLink="/favourites">
+            <mat-icon>favorite_border</mat-icon>
+            <span>Favourites</span>
+          </a>
+          <a mat-menu-item routerLink="/inquiries">
+            <mat-icon>mail_outline</mat-icon>
+            <span>Inquiries</span>
+          </a>
+          <a mat-menu-item routerLink="/profile">
+            <mat-icon>person_outline</mat-icon>
+            <span>Profile</span>
+          </a>
           <mat-divider></mat-divider>
           <button mat-menu-item type="button" (click)="logout()">
-            <mat-icon>logout</mat-icon>
+            <mat-icon color="warn">logout</mat-icon>
             <span>Logout</span>
           </button>
         } @else {
-          @for (link of guestLinks(); track link.path) {
-            <a mat-menu-item [routerLink]="link.path">{{ link.label }}</a>
-          }
+          <a mat-menu-item routerLink="/login">
+            <mat-icon>login</mat-icon>
+            <span>Login</span>
+          </a>
+          <a mat-menu-item routerLink="/register">
+            <mat-icon>person_add</mat-icon>
+            <span>Register</span>
+          </a>
         }
       </mat-menu>
     </div>

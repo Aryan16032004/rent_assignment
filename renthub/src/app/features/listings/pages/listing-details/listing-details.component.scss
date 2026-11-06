@@ -55,9 +55,13 @@
 
 .main-photo-frame {
   position: relative;
-  height: 380px;
+  height: clamp(230px, 60vw, 360px);
   cursor: pointer;
   overflow: hidden;
+
+  @media (min-width: 900px) {
+    height: 420px;
+  }
 
   .main-photo {
     width: 100%;
