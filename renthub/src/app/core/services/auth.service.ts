@@ -8,6 +8,11 @@ import { User, UserRole } from '../models/user.model';
 import { FavouriteService } from './favourite.service';
 import { StorageService } from './storage.service';
 
+/**
+ * Authentication Service
+ * Manages user authentication state using Angular Signals, persistent storage,
+ * login/registration HTTP workflows, and JWT session restoration.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -15,15 +20,26 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly storageService = inject(StorageService);
   private readonly favouriteService = inject(FavouriteService);
+
+  // Initial session restored synchronously from storage
   private readonly storedSession = this.storageService.getItem<AuthSession | null>(
     STORAGE_KEYS.authSession,
     null
   );
+
+  // Reactive state signal for the currently logged-in user
   private readonly currentUserSignal = signal<User | null>(this.storedSession?.user ?? null);
 
+  /** Readonly signal exposing the active user */
   readonly currentUser = this.currentUserSignal.asReadonly();
+
+  /** Computed signal indicating whether a user is currently authenticated */
   readonly isLoggedIn = computed(() => this.currentUserSignal() !== null);
 
+  /**
+   * Validates the stored JWT token with the backend on application startup (`/api/auth/me`).
+   * Automatically clears invalid or expired sessions.
+   */
   restoreSession(): Observable<void> {
     const session = this.storageService.getItem<AuthSession | null>(STORAGE_KEYS.authSession, null);
     if (!session?.token) {
@@ -46,6 +62,10 @@ export class AuthService {
     );
   }
 
+  /**
+   * Authenticates a user with email and password.
+   * On success, stores the JWT token and user profile in storage and signals.
+   */
   login(email: string, password: string): Observable<User> {
     return this.http
       .post<AuthResponse>(`${API_BASE_URL}/auth/login`, { email, password })
@@ -55,6 +75,9 @@ export class AuthService {
       );
   }
 
+  /**
+   * Registers a new user account with role selection ('renter', 'landlord', 'both').
+   */
   register(payload: {
     name: string;
     email: string;
@@ -74,6 +97,9 @@ export class AuthService {
       );
   }
 
+  /**
+   * Async validator query checking whether an email address is already registered.
+   */
   isEmailTaken(email: string): Observable<boolean> {
     const params = new HttpParams().set('email', email);
     return this.http
@@ -81,6 +107,9 @@ export class AuthService {
       .pipe(map((response) => response.taken));
   }
 
+  /**
+   * Updates user profile fields (name, phone, avatar).
+   */
   updateProfile(payload: {
     name?: string;
     phone?: string | null;
@@ -97,6 +126,9 @@ export class AuthService {
     );
   }
 
+  /**
+   * Updates user password after validating current password.
+   */
   changePassword(currentPassword: string, newPassword: string): Observable<void> {
     return this.http
       .patch<{ message: string }>(`${API_BASE_URL}/users/me/password`, {
@@ -106,12 +138,18 @@ export class AuthService {
       .pipe(map(() => void 0));
   }
 
+  /**
+   * Clears the active authentication session, removing stored token and resetting signals.
+   */
   logout(): void {
     this.currentUserSignal.set(null);
     this.storageService.removeItem(STORAGE_KEYS.authSession);
     this.favouriteService.clear();
   }
 
+  /**
+   * Returns the current raw JWT token string, or null if unauthenticated.
+   */
   getToken(): string | null {
     const session = this.storageService.getItem<AuthSession | null>(STORAGE_KEYS.authSession, null);
     return session?.token ?? null;

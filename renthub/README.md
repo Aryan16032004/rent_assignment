@@ -2,8 +2,9 @@
 
 RentHub is a modern, responsive apartment rental web application built with the latest **Angular** (standalone components, signals, reactive forms, Angular Material, and typed routing). It connects property seekers with landlords through rich listing management, interactive filters, inquiry workflows, and a community Q&A comments system.
 
+- **Live Deployed Frontend:** [https://renthub-frontend-lemon.vercel.app](https://renthub-frontend-lemon.vercel.app)
+- **Live Deployed Backend:** [https://renthub-backend-kappa.vercel.app/api](https://renthub-backend-kappa.vercel.app/api)
 - **GitHub Repository:** [https://github.com/Aryan16032004/rent_assignment](https://github.com/Aryan16032004/rent_assignment)
-- **Live Deployed App:** [https://renthub-demo.vercel.app](https://renthub-demo.vercel.app)
 
 ---
 
@@ -29,6 +30,7 @@ For quick evaluation, pre-seeded accounts are provided with preloaded listings a
 6. **Dark / Light Theme Mode:** Seamless theme switching with persistent storage across sessions.
 7. **Profile & Security Center:** Interactive profile editing (name, phone) and password change dialog with strict strength validation (min 8 chars, uppercase, number, symbol) and mismatch checks.
 8. **Indian Rupee (₹) Currency Standard:** Consistent formatting across listing cards, detail pages, filters, and forms.
+9. **Responsive Mobile & Laptop Design:** Interactive user dropdown menu on laptop to eliminate navbar crowding, plus proportional hero carousel and side-by-side action buttons on mobile screens.
 
 ---
 
@@ -46,26 +48,19 @@ For quick evaluation, pre-seeded accounts are provided with preloaded listings a
 
 ## Getting Started
 
-### 1. Prerequisites
-- Node.js 20+ or 22+
-- npm 10+
-
-### 2. Installation
+### 1. Installation
 ```bash
-# Navigate to the renthub directory
 cd renthub
-
-# Install dependencies
 npm install
 ```
 
-### 3. Run Development Server
+### 2. Run Development Server
 ```bash
 npm start
 # Opens at http://localhost:4200
 ```
 
-### 4. Run Automated Test Suite
+### 3. Run Automated Test Suite
 ```bash
 npm test
 ```
@@ -75,7 +70,7 @@ Runs 60 automated unit and end-to-end journey tests covering:
 - Core services (`auth.service.spec.ts`, `listing.service.spec.ts`)
 - Component units (`login`, `register`, `listing-form`, `preview-submit`, `listing-details`, `listing-card`, `app`)
 
-### 5. Production Build
+### 4. Production Build
 ```bash
 npm run build
 ```

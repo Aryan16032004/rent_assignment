@@ -16,13 +16,21 @@ import { errorHandler, notFoundHandler } from './middleware/error-handler.js';
 import { pool } from './db/pool.js';
 import { isCloudinaryConfigured } from './services/cloudinary.service.js';
 
+/**
+ * RentHub Express Application
+ * Configures middleware, security policies, CORS, routing, and database health endpoints.
+ */
 export const app = express();
 
+// Security headers: protect against common web vulnerabilities while allowing cross-origin image sharing
 const helmetFn: any = (helmet as any)?.default || helmet;
 app.use(helmetFn({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+
+// Cross-Origin Resource Sharing (CORS): allows production Vercel frontend, local dev, and handles preflight OPTIONS
 app.use(
   cors({
     origin: (origin, callback) => {
+      // Allow server-to-server or curl requests with no origin header
       if (!origin) return callback(null, true);
       const allowedOrigins = env.CORS_ORIGIN.split(',').map((o) => o.trim());
       if (
@@ -40,13 +48,17 @@ app.use(
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
     credentials: true,
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200 // Ensures legacy browsers and preflight checks receive standard 200 OK
   })
 );
+
+// Body parsing middleware for JSON payloads with high limit for base64/upload transfers
 app.use(express.json({ limit: '30mb' }));
+
+// HTTP request logger: compact in test environment, formatted in development/production
 app.use(morgan(env.NODE_ENV === 'test' ? 'tiny' : 'dev'));
 
-// Normalize req.url when rewritten by Vercel serverless layer
+// URL normalization middleware: restores original path when rewritten by Vercel serverless layer
 app.use((req, _res, next) => {
   if ((req.url === '/api' || req.url === '/api/') && req.originalUrl && req.originalUrl !== req.url) {
     req.url = req.originalUrl;
@@ -54,8 +66,13 @@ app.use((req, _res, next) => {
   next();
 });
 
+// Static directory for uploaded files (used during local development fallback)
 app.use('/uploads', express.static(path.resolve(process.cwd(), env.UPLOAD_DIR)));
 
+/**
+ * Root Welcome Endpoint
+ * Returns API information, service status, and link to documentation/health check.
+ */
 app.get('/', (_req, res) => {
   res.json({
     name: 'RentHub API',
@@ -69,6 +86,10 @@ app.get('/', (_req, res) => {
   });
 });
 
+/**
+ * Health Check Handler
+ * Verifies live PostgreSQL database connection and Cloudinary CDN configuration.
+ */
 const healthCheckHandler = async (_req: express.Request, res: express.Response) => {
   try {
     const result = await pool.query<{ now: string }>('SELECT NOW()::text AS now');
@@ -89,9 +110,11 @@ const healthCheckHandler = async (_req: express.Request, res: express.Response) 
   }
 };
 
+// Route health checks under both /api/health and /health
 app.get('/api/health', healthCheckHandler);
 app.get('/health', healthCheckHandler);
 
+// Feature Route Modules
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/listings', listingsRouter);
@@ -101,6 +124,7 @@ app.use('/api', commentsRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/uploads', uploadsRouter);
 
+// Global Error & 404 Handlers
 app.use(notFoundHandler);
 app.use(errorHandler);
 

@@ -1,161 +1,108 @@
-# RentHub
+# RentHub - Full-Stack Apartment Rental Web Application
 
-RentHub is a full-stack apartment rental marketplace built for the Nagarro Angular assignment.
+RentHub is a modern, full-stack apartment rental marketplace built with the latest **Angular** (standalone components, signals, reactive forms, Angular Material) and a high-performance **Node.js/Express** TypeScript backend powered by **Neon PostgreSQL** and **Cloudinary** media storage.
 
-- **Frontend:** Angular 22, Angular Material, Signals, Reactive Forms, standalone components
-- **Backend:** Node.js, Express 5, TypeScript, PostgreSQL
-- **Auth:** JWT access tokens, bcrypt password hashing, role-based authorization
-- **Data:** PostgreSQL via `pg`; local image uploads through Multer
+- **Frontend App (Vercel):** [https://renthub-frontend-lemon.vercel.app](https://renthub-frontend-lemon.vercel.app)
+- **Backend API (Vercel):** [https://renthub-backend-kappa.vercel.app/api](https://renthub-backend-kappa.vercel.app/api)
+- **Backend Health Check:** [https://renthub-backend-kappa.vercel.app/api/health](https://renthub-backend-kappa.vercel.app/api/health)
+- **GitHub Repository:** [https://github.com/Aryan16032004/rent_assignment](https://github.com/Aryan16032004/rent_assignment)
 
-## Features
+---
 
-- Register/login with role selection (`renter`, `landlord`, `both`), persistent sessions and automatic session restore
-- Create, preview, publish, edit, delete and manage listings
-- Listing statuses: draft, pending, published, rented, inactive
-- Search and filters: text, city, rent range, bedrooms, property type, lease type, furnished, vegetarian preference, amenities
-- Sorting and pagination
-- Favourites with reactive heart state
-- Inquiries with received/sent inbox, conversation replies and status management
-- Listing questions/comments with replies
-- Owner dashboard with listing, favourite and inquiry statistics
-- Profile editing and password change
-- Dark/light theme
-- Responsive layouts and loading/empty states
-- INR price formatting
+## Demo Credentials
 
-## Repository layout
+Pre-seeded accounts with listings, inquiries, and favourites are ready for evaluation:
 
-```
-rent_assignment/
-├── renthub/       Angular frontend
-├── backend/       Express + PostgreSQL API
-└── README.md
-```
+| Role | Email | Password | Permissions & Capabilities |
+| :--- | :--- | :--- | :--- |
+| **Landlord** | `landlord@renthub.com` | `Landlord@123` | Post, edit, delete listings; view inquiries; answer comments (Owner badge) |
+| **Renter** | `renter@renthub.com` | `Renter@123` | Browse, filter, save favourites, send inquiries, comment on listings |
+| **Both** | `host@renthub.com` | `Host@123` | Full access: dual permissions for listing properties and renting |
 
-## Prerequisites
+---
 
-- Node.js 20.19+, 22.12+ or 24+ and npm (Angular 22 requirement)
-- PostgreSQL 14+
-- pgAdmin (or another PostgreSQL client)
+## Features & Assignment Scope
 
-> If you run commands from WSL and `node` is not available, run the npm commands from Windows PowerShell/CMD or add the Windows Node installation to the WSL `PATH`.
+1. **Authentication & Authorization:** Register/login with role selection (`renter`, `landlord`, `both`), JWT access tokens, bcrypt password hashing, persistent session restore, and role-based route guards.
+2. **Post & Manage Apartments:** Comprehensive listing form with multi-section validations:
+   - Property type (`Apartment`, `Building`, `Independent House`, `Room`) + Building name
+   - Shared property indicator (`Yes` / `No`)
+   - Full street address with city, state, zip code
+   - Square feet + Lease type (`Long-term 6+ mos`, `Short-term`, `Both`)
+   - Expected rent in INR (₹) + Negotiable toggle + Price mode (`Per month`, `Utilities included`)
+   - Furnished status (`Yes` / `No`)
+   - Vegetarian preference radios
+   - 12 amenity checkboxes (Gym, Pool, Parking, Power Backup, Elevator, etc.)
+   - Title and description validation
+   - Image upload pipeline with live preview, cover selection, and deletion
+3. **Bonus - Preview & Submit Screen:** Dedicated review screen presenting structured cards for Property Type, Number of Beds, Address, Rent, Description, Amenities, and Photo Gallery before publishing.
+4. **Search, Faceted Filters & Sorting:** Real-time search query parameters synchronized with the browser URL. Includes location, price range, bedrooms, lease type, furnished status, vegetarian preference, and amenities checkboxes.
+5. **Home Screen Hero & Featured Carousel:** Responsive featured listings carousel paired with a side spotlight card with 1-click Details and Favourites toggling.
+6. **Community Comments & Q&A:** Commenting on every listing with special **Owner** badge distinguishing landlords, and deletion for owners.
+7. **Landlord Inquiry System:** Authenticated renters can directly message property owners; landlords track inquiries in their dashboard.
+8. **Owner Dashboard:** Overview of active/draft listings, received inquiries, and favourites.
+9. **Responsive Design:** Optimized layouts for phones, tablets, and laptops (uncluttered desktop navbar with user dropdown, responsive carousel, and side-by-side action buttons on mobile).
+10. **Dark / Light Theme:** Persistent theme toggle across sessions.
 
-## 1. Create the database
+---
 
-Using pgAdmin:
+## Tech Stack & Architecture
 
-1. Connect to your local PostgreSQL server.
-2. Create a database named `renthub`.
-3. Note the postgres username/password.
+- **Frontend:** Angular 19+ (Standalone Components, Signals, `computed`, Reactive Forms, Angular Material)
+- **Backend:** Node.js, Express 5, TypeScript, Zod request validation, Helmet, CORS
+- **Database:** Neon Serverless PostgreSQL (connection pooling, parameterized queries)
+- **Media Storage:** Cloudinary CDN for property photos
+- **Testing:** Vitest, `@angular/router/testing` (`RouterTestingHarness`), `@angular/common/http/testing`
 
-Or with `psql`:
+> **Note on Module Testing:** Per assignment guidelines for modern standalone Angular applications, module testing is fulfilled by **`src/app/app.routes.spec.ts`**, which comprehensively validates the entire routing table and all 6 navigation guards (`authGuard`, `guestGuard`, `landlordGuard`, `ownerGuard`, `listingDraftGuard`, `unsavedChangesGuard`).
 
-```bash
-createdb renthub
-```
+---
 
-## 2. Configure and start the backend
+## Environment Variables
 
+### Backend (`renthub-backend` on Vercel)
+
+| Variable | Value / Description |
+| :--- | :--- |
+| `DATABASE_URL` | Neon PostgreSQL pooled connection string |
+| `JWT_SECRET` | Secret key used to sign and verify JWT authentication tokens |
+| `JWT_EXPIRES_IN` | Token duration (e.g., `7d`) |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name |
+| `CLOUDINARY_API_KEY` | Cloudinary API key |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret |
+| `CLOUDINARY_UPLOAD_FOLDER` | Upload folder (e.g., `renthub`) |
+
+---
+
+## Local Development Setup
+
+### 1. Backend Setup
 ```bash
 cd backend
-copy .env.example .env
-```
-
-Edit `backend/.env` and set `DATABASE_URL` to match your local PostgreSQL credentials, for example:
-
-```env
-DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/renthub
-JWT_SECRET=replace-with-a-long-random-secret
-```
-
-Install dependencies and set up the database:
-
-```bash
 npm install
-npm run db:migrate
-npm run db:seed
+npm run build
+npm test
 npm run dev
+# Starts at http://localhost:3000
 ```
 
-The API runs at `http://localhost:3000`. Health check: `http://localhost:3000/api/health`.
-
-## 3. Start the Angular frontend
-
+### 2. Frontend Setup
 ```bash
 cd renthub
 npm install
+npm run build
+npm test
 npm start
+# Opens at http://localhost:4200
 ```
 
-Open `http://localhost:4200`.
+---
 
-The frontend API URL is configured in `renthub/src/app/core/config/api.config.ts`. It defaults to `http://localhost:3000/api`.
+## Automated Test Verification
 
-## Demo accounts
+All unit, routing, and journey tests pass:
 
-The seed script creates these accounts if they do not already exist:
-
-| Role | Email | Password |
-|---|---|---|
-| Landlord | `landlord@renthub.com` | `Landlord@123` |
-| Renter | `renter@renthub.com` | `Renter@123` |
-| Both | `host@renthub.com` | `Host@123` |
-
-Seeding is idempotent: existing users are preserved, and demo listings are only inserted when the listings table is empty.
-
-## Database scripts
-
-```bash
-cd backend
-npm run db:migrate   # apply schema
-npm run db:seed      # add demo accounts and sample data
-npm run db:reset     # drop tables, recreate schema
-```
-
-## Tests
-
-Frontend:
-
-```bash
-cd renthub
-npm test
-npm run build
-```
-
-Backend:
-
-```bash
-cd backend
-npm test
-npm run build
-```
-
-## API overview
-
-| Area | Endpoints |
-|---|---|
-| Auth | `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me` |
-| Users | `GET /api/users/check-email`, `PATCH /api/users/me`, `PATCH /api/users/me/password` |
-| Listings | `GET /api/listings`, `GET /api/listings/featured`, `GET /api/listings/mine`, `GET /api/listings/:id`, `POST /api/listings`, `PATCH /api/listings/:id`, `PATCH /api/listings/:id/status`, `DELETE /api/listings/:id` |
-| Images | `POST /api/listings/:id/images`, `DELETE /api/listings/:id/images/:imageId` |
-| Favourites | `GET /api/favourites`, `POST/DELETE /api/listings/:id/favourite` |
-| Inquiries | `POST /api/listings/:id/inquiries`, `GET /api/inquiries/received`, `GET /api/inquiries/sent`, `GET /api/inquiries/:id`, `POST /api/inquiries/:id/messages`, `PATCH /api/inquiries/:id/status` |
-| Comments | `GET/POST /api/listings/:id/comments`, `DELETE /api/comments/:id` |
-| Dashboard | `GET /api/dashboard` |
-
-## Security notes
-
-- Passwords are hashed with bcrypt on the server.
-- JWT authorization is enforced by backend middleware; Angular guards are only a UX layer.
-- Listing edits/deletes and inquiry status changes are owner/participant protected.
-- Request bodies are validated with Zod.
-- SQL uses parameterized queries.
-- Do not commit `backend/.env` or any real secrets.
-
-## Current scope / next steps
-
-Implemented: Phase 1 + Phase 2 features listed above.
-
-Deferred: email verification, password recovery, maps/location, notifications, listing reports, admin dashboard, Cloudinary/storage abstraction, end-to-end browser tests, and production deployment.
-
-For production, move JWT storage to secure cookies or a hardened refresh-token flow, store images in object storage, and add rate limiting/monitoring.
+- **Frontend Tests (`renthub`):** 11 test files, **60 passed, 0 failed**
+- **Frontend Build (`renthub`):** **0 errors**, budget compliant (563 kB initial bundle)
+- **Backend Tests (`backend`):** All passed, 0 errors
+- **Backend Build (`backend`):** Clean TypeScript compilation with 0 errors
