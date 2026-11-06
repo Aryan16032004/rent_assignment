@@ -74,10 +74,11 @@ const healthCheckHandler = async (_req: express.Request, res: express.Response) 
       cloudinary: isCloudinaryConfigured() ? 'configured' : 'disabled',
       timestamp: new Date().toISOString()
     });
-  } catch {
+  } catch (err: any) {
     res.status(503).json({
       status: 'degraded',
       database: 'disconnected',
+      error: err?.message || String(err),
       timestamp: new Date().toISOString()
     });
   }
