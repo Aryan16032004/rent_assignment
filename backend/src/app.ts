@@ -28,14 +28,19 @@ app.use(
       if (
         allowedOrigins.includes('*') ||
         allowedOrigins.includes(origin) ||
+        origin === 'https://renthub-frontend-lemon.vercel.app' ||
         origin.endsWith('.vercel.app') ||
-        origin.includes('localhost')
+        origin.includes('localhost') ||
+        origin.includes('127.0.0.1')
       ) {
         return callback(null, true);
       }
       return callback(null, true);
     },
-    credentials: true
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+    credentials: true,
+    optionsSuccessStatus: 200
   })
 );
 app.use(express.json({ limit: '30mb' }));
