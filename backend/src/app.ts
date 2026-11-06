@@ -18,7 +18,8 @@ import { isCloudinaryConfigured } from './services/cloudinary.service.js';
 
 export const app = express();
 
-app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+const helmetFn: any = (helmet as any)?.default || helmet;
+app.use(helmetFn({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(
   cors({
     origin: (origin, callback) => {
