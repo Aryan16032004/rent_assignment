@@ -13,8 +13,17 @@ import {
   type MediaType
 } from '../services/cloudinary.service.js';
 
+/**
+ * Apartment Listings Router
+ * Manages full lifecycle of rental listings:
+ * - Public search, faceted filtering, pagination, and sorting
+ * - Featured spotlight carousel listings
+ * - Landlord listing creation, updates, status changes, and deletion
+ * - Image and media uploads to Cloudinary CDN
+ */
 export const listingsRouter = Router();
 
+// Multer memory storage configuration for multipart image uploads
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 50 * 1024 * 1024, files: 6 },

@@ -2,6 +2,12 @@ import { v2 as cloudinary, type UploadApiResponse } from 'cloudinary';
 import { env } from '../config/env.js';
 import { HttpError } from '../utils/http-error.js';
 
+/**
+ * Cloudinary Media Storage Service
+ * Manages secure file uploads, media format verification, CDN asset URL generation,
+ * video thumbnail generation, and asset deletion.
+ */
+
 export type MediaType = 'image' | 'video';
 
 export interface UploadedMedia {

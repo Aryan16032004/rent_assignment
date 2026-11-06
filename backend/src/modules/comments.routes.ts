@@ -6,6 +6,10 @@ import { validateBody } from '../middleware/validate.js';
 import { asyncHandler } from '../utils/async-handler.js';
 import { HttpError } from '../utils/http-error.js';
 
+/**
+ * Listing Comments & Community Q&A Router
+ * Handles public questions and nested 1-level replies on listings.
+ */
 export const commentsRouter = Router();
 
 interface CommentRow {

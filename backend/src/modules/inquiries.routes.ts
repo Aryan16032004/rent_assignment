@@ -6,6 +6,10 @@ import { validateBody } from '../middleware/validate.js';
 import { asyncHandler } from '../utils/async-handler.js';
 import { HttpError } from '../utils/http-error.js';
 
+/**
+ * Landlord & Renter Inquiries Router
+ * Manages direct tenant-to-landlord inquiries, conversation replies, and status transitions.
+ */
 export const inquiriesRouter = Router();
 
 interface InquiryRow {
