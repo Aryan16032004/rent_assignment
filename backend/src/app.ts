@@ -21,7 +21,19 @@ export const app = express();
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(
   cors({
-    origin: env.CORS_ORIGIN.split(',').map((origin) => origin.trim()),
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      const allowedOrigins = env.CORS_ORIGIN.split(',').map((o) => o.trim());
+      if (
+        allowedOrigins.includes('*') ||
+        allowedOrigins.includes(origin) ||
+        origin.endsWith('.vercel.app') ||
+        origin.includes('localhost')
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true
   })
 );
@@ -60,3 +72,5 @@ app.use('/api/uploads', uploadsRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
+
+export default app;
