@@ -41,9 +41,30 @@ app.use(
 app.use(express.json({ limit: '30mb' }));
 app.use(morgan(env.NODE_ENV === 'test' ? 'tiny' : 'dev'));
 
+// Normalize req.url when rewritten by Vercel serverless layer
+app.use((req, _res, next) => {
+  if ((req.url === '/api' || req.url === '/api/') && req.originalUrl && req.originalUrl !== req.url) {
+    req.url = req.originalUrl;
+  }
+  next();
+});
+
 app.use('/uploads', express.static(path.resolve(process.cwd(), env.UPLOAD_DIR)));
 
-app.get('/api/health', async (_req, res) => {
+app.get('/', (_req, res) => {
+  res.json({
+    name: 'RentHub API',
+    status: 'online',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      listings: '/api/listings',
+      auth: '/api/auth'
+    }
+  });
+});
+
+const healthCheckHandler = async (_req: express.Request, res: express.Response) => {
   try {
     const result = await pool.query<{ now: string }>('SELECT NOW()::text AS now');
     res.json({
@@ -60,7 +81,10 @@ app.get('/api/health', async (_req, res) => {
       timestamp: new Date().toISOString()
     });
   }
-});
+};
+
+app.get('/api/health', healthCheckHandler);
+app.get('/health', healthCheckHandler);
 
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
