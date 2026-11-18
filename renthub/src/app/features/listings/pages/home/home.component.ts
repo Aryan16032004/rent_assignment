@@ -1,11 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   inject,
   signal
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -47,7 +45,6 @@ export class HomeComponent {
   private readonly listingService = inject(ListingService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly destroyRef = inject(DestroyRef);
 
   readonly featuredListings = signal<Listing[]>([]);
   readonly pagedResult = signal<PagedResult<Listing>>({
@@ -82,9 +79,9 @@ export class HomeComponent {
   loadFeatured(): void {
     this.listingService
       .getFeatured()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((featured) => {
-        this.featuredListings.set(featured);
+      .subscribe({
+        next: (featured) => this.featuredListings.set(featured),
+        error: (err) => console.error(err)
       });
   }
 
@@ -137,7 +134,6 @@ export class HomeComponent {
 
     this.listingService
       .queryListings(query)
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (result) => {
           this.pagedResult.set(result);

@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -15,6 +14,10 @@ import { matchFieldsValidator } from '../../../../shared/validators/match-fields
 import { passwordStrengthValidator } from '../../../../shared/validators/password-strength.validator';
 import { uniqueEmailAsyncValidator } from '../../../../shared/validators/unique-email.validator';
 
+/**
+ * Register Component
+ * User Sign Up Form with reactive validations for name, email uniqueness, password strength, and confirm password matching.
+ */
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -37,7 +40,6 @@ export class RegisterComponent {
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  private readonly destroyRef = inject(DestroyRef);
 
   readonly hidePassword = signal(true);
   readonly hideConfirmPassword = signal(true);
@@ -71,10 +73,9 @@ export class RegisterComponent {
     }
   );
 
-  private readonly formStatus = toSignal(this.form.statusChanges, {
-    initialValue: this.form.status
-  });
-  readonly isSubmitDisabled = computed(() => this.formStatus() !== 'VALID' || this.isSubmitting());
+  isSubmitDisabled(): boolean {
+    return this.form.invalid || this.form.pending || this.isSubmitting();
+  }
 
   submit(): void {
     this.submitError.set(null);
@@ -95,7 +96,6 @@ export class RegisterComponent {
         password: this.form.controls.password.value,
         role: this.role()
       })
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.toastService.success('Your RentHub account is ready.');
@@ -109,83 +109,61 @@ export class RegisterComponent {
       });
   }
 
+  setRole(r: UserRole): void {
+    this.role.set(r);
+  }
+
   togglePasswordVisibility(): void {
-    this.hidePassword.update((current) => !current);
+    this.hidePassword.update((c) => !c);
   }
 
   toggleConfirmPasswordVisibility(): void {
-    this.hideConfirmPassword.update((current) => !current);
+    this.hideConfirmPassword.update((c) => !c);
   }
 
   protected getNameErrorMessage(): string {
     const control = this.form.controls.name;
-
-    if (control.hasError('required')) {
-      return 'Name is required.';
-    }
-
-    if (control.hasError('minlength')) {
-      return 'Name must be at least 2 characters.';
-    }
-
-    if (control.hasError('maxlength')) {
-      return 'Name must not exceed 60 characters.';
-    }
-
+    if (control.hasError('required')) return 'Name is required.';
+    if (control.hasError('minlength')) return 'Name must have at least 2 characters.';
     return '';
   }
 
   protected getEmailErrorMessage(): string {
     const control = this.form.controls.email;
-
-    if (control.hasError('required')) {
-      return 'Email is required.';
-    }
-
-    if (control.hasError('email')) {
-      return 'Enter a valid email address.';
-    }
-
-    if (control.hasError('emailTaken')) {
-      return 'This email is already registered.';
-    }
-
+    if (control.hasError('required')) return 'Email is required.';
+    if (control.hasError('email')) return 'Enter a valid email address.';
+    if (control.hasError('emailTaken')) return 'This email is already registered.';
     return '';
   }
 
   protected getPasswordErrorMessage(): string {
     const control = this.form.controls.password;
-
-    if (control.hasError('required')) {
-      return 'Password is required.';
-    }
-
-    if (control.hasError('passwordStrength')) {
-      return 'Use 8+ chars with uppercase, number, and special character.';
-    }
-
+    if (control.hasError('required')) return 'Password is required.';
+    if (control.hasError('minlength')) return 'Must be at least 8 characters.';
+    if (control.hasError('noUppercase')) return 'Requires at least one uppercase letter.';
+    if (control.hasError('noLowercase')) return 'Requires at least one lowercase letter.';
+    if (control.hasError('noNumber')) return 'Requires at least one digit.';
+    if (control.hasError('noSpecialChar')) return 'Requires at least one special character.';
     return '';
   }
 
   protected getConfirmPasswordErrorMessage(): string {
     const control = this.form.controls.confirmPassword;
-
-    if (control.hasError('required')) {
-      return 'Confirm your password.';
-    }
-
-    if (this.form.hasError('passwordMismatch') && (control.touched || control.dirty)) {
-      return 'Passwords do not match.';
-    }
-
+    if (control.hasError('required')) return 'Confirm your password.';
+    if (this.form.hasError('passwordMismatch')) return 'Passwords do not match.';
     return '';
   }
 
   private resolveErrorMessage(error: unknown): string {
+    if (error && typeof error === 'object' && 'error' in error) {
+      const httpErr = error as { error?: { message?: string } };
+      if (typeof httpErr.error?.message === 'string') {
+        return httpErr.error.message;
+      }
+    }
     if (error instanceof Error && error.message.trim().length > 0) {
       return error.message;
     }
-
-    return 'Unable to register right now. Please try again.';
+    return 'Registration failed. Please try again.';
   }
 }

@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -33,7 +32,6 @@ export class ProfileComponent {
   private readonly authService = inject(AuthService);
   private readonly dashboardService = inject(DashboardService);
   private readonly toastService = inject(ToastService);
-  private readonly destroyRef = inject(DestroyRef);
 
   readonly user = this.authService.currentUser;
   readonly dashboard = signal<DashboardData | null>(null);
@@ -60,11 +58,7 @@ export class ProfileComponent {
       }),
       newPassword: new FormControl('', {
         nonNullable: true,
-        validators: [
-          Validators.required,
-          Validators.minLength(8),
-          passwordStrengthValidator()
-        ]
+        validators: [Validators.required, passwordStrengthValidator()]
       }),
       confirmPassword: new FormControl('', {
         nonNullable: true,
@@ -72,19 +66,13 @@ export class ProfileComponent {
       })
     },
     {
-      validators: [
-        matchFieldsValidator('newPassword', 'confirmPassword', 'passwordMismatch'),
-        (group: AbstractControl) => {
-          const current = group.get('currentPassword')?.value;
-          const next = group.get('newPassword')?.value;
-          if (current && next && current === next) {
-            return { sameAsCurrent: true };
-          }
-          return null;
-        }
-      ]
+      validators: [matchFieldsValidator('newPassword', 'confirmPassword', 'passwordMismatch')]
     }
   );
+
+  protected getPasswordControl(name: 'currentPassword' | 'newPassword' | 'confirmPassword'): AbstractControl {
+    return this.passwordForm.controls[name];
+  }
 
   ngOnInit(): void {
     const user = this.user();
@@ -95,10 +83,9 @@ export class ProfileComponent {
   }
 
   loadDashboard(): void {
-    this.dashboardService
-      .getDashboard()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({ next: (data) => this.dashboard.set(data) });
+    this.dashboardService.getDashboard().subscribe({
+      next: (data) => this.dashboard.set(data)
+    });
   }
 
   saveProfile(): void {
@@ -111,7 +98,6 @@ export class ProfileComponent {
     const value = this.profileForm.getRawValue();
     this.authService
       .updateProfile({ name: value.name.trim(), phone: value.phone.trim() || null })
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.toastService.success('Profile updated successfully.');
@@ -131,7 +117,6 @@ export class ProfileComponent {
     const value = this.passwordForm.getRawValue();
     this.authService
       .changePassword(value.currentPassword, value.newPassword)
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.toastService.success('Password updated successfully.');

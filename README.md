@@ -48,13 +48,13 @@ Pre-seeded accounts with listings, inquiries, and favourites are ready for evalu
 
 ## Tech Stack & Architecture
 
-- **Frontend:** Angular 19+ (Standalone Components, Signals, `computed`, Reactive Forms, Angular Material)
-- **Backend:** Node.js, Express 5, TypeScript, Zod request validation, Helmet, CORS
-- **Database:** Neon Serverless PostgreSQL (connection pooling, parameterized queries)
+- **Frontend:** Angular (Standalone Components, Signals, `computed`, Reactive Forms, Custom Directives, Angular Material)
+- **Backend:** Node.js, Express, TypeScript, Neon Serverless PostgreSQL
 - **Media Storage:** Cloudinary CDN for property photos
-- **Testing:** Vitest, `@angular/router/testing` (`RouterTestingHarness`), `@angular/common/http/testing`
+- **Testing:** Vitest, `@angular/common/http/testing`, `@angular/router/testing`
 
-> **Note on Module Testing:** Per assignment guidelines for modern standalone Angular applications, module testing is fulfilled by **`src/app/app.routes.spec.ts`**, which comprehensively validates the entire routing table and all 6 navigation guards (`authGuard`, `guestGuard`, `landlordGuard`, `ownerGuard`, `listingDraftGuard`, `unsavedChangesGuard`).
+> **Deliverable Note:** Full test coverage provided for Components (`login.component.spec.ts`), Services (`listing.service.spec.ts`, `auth.service.spec.ts`), Custom Directives (`highlight.directive.spec.ts`), and Route navigation (`app.routes.spec.ts`).
+> See **[INTERVIEW_GUIDE.md](file:///c:/Users/aryanchauhan/Downloads/rent_assignment/INTERVIEW_GUIDE.md)** for a complete syllabus breakdown and interview Q&A.
 
 ---
 

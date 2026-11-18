@@ -1,14 +1,12 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   computed,
   inject,
   input,
   output,
   signal
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CurrencyPipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,12 +18,14 @@ import { FavouriteService } from '../../../../core/services/favourite.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { Listing } from '../../../../core/models/listing.model';
 import { TruncatePipe } from '../../../../shared/pipes/truncate.pipe';
+import { HighlightDirective } from '../../../../shared/directives/highlight.directive';
 
 @Component({
   selector: 'app-listing-card',
   standalone: true,
   imports: [
     CurrencyPipe,
+    HighlightDirective,
     MatButtonModule,
     MatCardModule,
     MatChipsModule,
@@ -42,7 +42,6 @@ export class ListingCardComponent {
   private readonly favouriteService = inject(FavouriteService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
-  private readonly destroyRef = inject(DestroyRef);
 
   readonly listing = input.required<Listing>();
   readonly favouriteToggled = output<{ listingId: string; isFavourite: boolean }>();
@@ -78,16 +77,14 @@ export class ListingCardComponent {
     }
 
     const listingId = this.listing().id;
-    this.favouriteService
-      .toggleFavourite(user.id, listingId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (isNowFav) => {
-          this.toastService.success(
-            isNowFav ? 'Added to favourites!' : 'Removed from favourites.'
-          );
-          this.favouriteToggled.emit({ listingId, isFavourite: isNowFav });
-        }
-      });
+    this.favouriteService.toggleFavourite(user.id, listingId).subscribe({
+      next: (isNowFav) => {
+        this.toastService.success(
+          isNowFav ? 'Added to favourites!' : 'Removed from favourites.'
+        );
+        this.favouriteToggled.emit({ listingId, isFavourite: isNowFav });
+      },
+      error: (err) => console.error(err)
+    });
   }
 }

@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -32,7 +31,6 @@ export class InquiriesComponent {
   private readonly inquiryService = inject(InquiryService);
   private readonly authService = inject(AuthService);
   private readonly toastService = inject(ToastService);
-  private readonly destroyRef = inject(DestroyRef);
 
   readonly user = this.authService.currentUser;
   readonly activeTab = signal<'received' | 'sent'>('received');
@@ -53,21 +51,17 @@ export class InquiriesComponent {
 
   load(): void {
     this.isLoading.set(true);
-    this.inquiryService
-      .getReceived()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({ next: (items) => this.received.set(items) });
+    this.inquiryService.getReceived().subscribe({
+      next: (items) => this.received.set(items)
+    });
 
-    this.inquiryService
-      .getSent()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (items) => {
-          this.sent.set(items);
-          this.isLoading.set(false);
-        },
-        error: () => this.isLoading.set(false)
-      });
+    this.inquiryService.getSent().subscribe({
+      next: (items) => {
+        this.sent.set(items);
+        this.isLoading.set(false);
+      },
+      error: () => this.isLoading.set(false)
+    });
   }
 
   currentList(): Inquiry[] {
@@ -75,10 +69,9 @@ export class InquiriesComponent {
   }
 
   selectInquiry(inquiry: Inquiry): void {
-    this.inquiryService
-      .getById(inquiry.id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({ next: (full) => this.selected.set(full) });
+    this.inquiryService.getById(inquiry.id).subscribe({
+      next: (full) => this.selected.set(full)
+    });
   }
 
   isReceiver(inquiry: Inquiry): boolean {
@@ -86,21 +79,18 @@ export class InquiriesComponent {
   }
 
   updateStatus(inquiry: Inquiry, status: InquiryStatus): void {
-    this.inquiryService
-      .updateStatus(inquiry.id, status)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (updated) => {
-          this.received.update((items) =>
-            items.map((item) => (item.id === updated.id ? { ...item, status } : item))
-          );
-          const current = this.selected();
-          if (current?.id === updated.id) {
-            this.selected.set({ ...current, status });
-          }
-          this.toastService.success(`Inquiry marked as ${status}.`);
+    this.inquiryService.updateStatus(inquiry.id, status).subscribe({
+      next: (updated) => {
+        this.received.update((items) =>
+          items.map((item) => (item.id === updated.id ? { ...item, status } : item))
+        );
+        const current = this.selected();
+        if (current?.id === updated.id) {
+          this.selected.set({ ...current, status });
         }
-      });
+        this.toastService.success(`Inquiry marked as ${status}.`);
+      }
+    });
   }
 
   sendReply(): void {
@@ -111,16 +101,13 @@ export class InquiriesComponent {
     }
 
     this.isSending.set(true);
-    this.inquiryService
-      .reply(inquiry.id, this.replyControl.value)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.replyControl.reset();
-          this.isSending.set(false);
-          this.selectInquiry(inquiry);
-        },
-        error: () => this.isSending.set(false)
-      });
+    this.inquiryService.reply(inquiry.id, this.replyControl.value).subscribe({
+      next: () => {
+        this.replyControl.reset();
+        this.isSending.set(false);
+        this.selectInquiry(inquiry);
+      },
+      error: () => this.isSending.set(false)
+    });
   }
 }

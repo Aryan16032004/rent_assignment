@@ -1,14 +1,12 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   computed,
   inject,
   input,
   output,
   signal
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CurrencyPipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -40,7 +38,6 @@ export class FeaturedCarouselComponent {
   private readonly favouriteService = inject(FavouriteService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
-  private readonly destroyRef = inject(DestroyRef);
 
   readonly items = input<Listing[]>([]);
   readonly favouriteToggled = output<{ listingId: string; isFavourite: boolean }>();
@@ -138,7 +135,6 @@ export class FeaturedCarouselComponent {
 
     this.favouriteService
       .toggleFavourite(user.id, listing.id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (isNowFav) => {
           this.toastService.success(

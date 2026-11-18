@@ -1,12 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   computed,
   inject,
   signal
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CurrencyPipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -19,6 +17,10 @@ import { ListingDraftService } from '../../../../core/services/listing-draft.ser
 import { ListingService } from '../../../../core/services/listing.service';
 import { ToastService } from '../../../../core/services/toast.service';
 
+/**
+ * Preview & Submit Component (Bonus feature)
+ * Allows reviewing listing details before publishing to backend.
+ */
 @Component({
   selector: 'app-preview-submit',
   standalone: true,
@@ -39,7 +41,6 @@ export class PreviewSubmitComponent {
   private readonly authService = inject(AuthService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
-  private readonly destroyRef = inject(DestroyRef);
 
   readonly draft = computed(() => this.draftService.draft());
   readonly isSubmitting = signal(false);
@@ -73,7 +74,6 @@ export class PreviewSubmitComponent {
 
     this.listingService
       .create(fullListing)
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (created) => {
           this.toastService.success('Listing submitted and published successfully!');

@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { firstValueFrom } from 'rxjs';
+import { API_BASE_URL, SERVER_BASE_URL } from '../config/api.config';
 import { Listing } from '../models/listing.model';
 import { ListingService } from './listing.service';
 
@@ -73,17 +74,17 @@ describe('ListingService', () => {
   it('normalizes relative image URLs returned by the API', async () => {
     const promise = firstValueFrom(service.getById('l-1'));
 
-    const request = httpMock.expectOne('http://localhost:3000/api/listings/l-1');
+    const request = httpMock.expectOne(`${API_BASE_URL}/listings/l-1`);
     request.flush(mockListing);
 
     const result = await promise;
-    expect(result?.photos[0]).toBe('http://localhost:3000/uploads/photo.jpg');
+    expect(result?.photos[0]).toBe(`${SERVER_BASE_URL}/uploads/photo.jpg`);
   });
 
   it('loads the authenticated user listings from /mine', async () => {
     const promise = firstValueFrom(service.getMine());
 
-    const request = httpMock.expectOne('http://localhost:3000/api/listings/mine');
+    const request = httpMock.expectOne(`${API_BASE_URL}/listings/mine`);
     request.flush([mockListing]);
 
     expect((await promise).length).toBe(1);

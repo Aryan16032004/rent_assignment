@@ -1,4 +1,12 @@
+:host {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .filters-card {
+  width: 100%;
+  box-sizing: border-box;
   padding: 18px 20px;
   border-radius: 20px !important;
   margin-bottom: 2.25rem;

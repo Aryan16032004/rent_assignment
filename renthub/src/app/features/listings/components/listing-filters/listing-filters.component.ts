@@ -1,15 +1,12 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   computed,
   effect,
-  inject,
   input,
   output,
   signal
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
@@ -47,8 +44,6 @@ import { ListingFilterCriteria } from '../../../../core/models/listing-query.mod
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ListingFiltersComponent {
-  private readonly destroyRef = inject(DestroyRef);
-
   readonly criteria = input<ListingFilterCriteria>({});
   readonly totalResults = input<number>(0);
   readonly filtersChanged = output<ListingFilterCriteria>();
@@ -175,14 +170,14 @@ export class ListingFiltersComponent {
 
     // Debounced text search
     this.filterForm.controls.searchTerm.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe((value) => {
         this.formState.update((state) => ({ ...state, searchTerm: value }));
         this.emitFilters();
       });
 
     this.filterForm.valueChanges
-      .pipe(debounceTime(150), takeUntilDestroyed(this.destroyRef))
+      .pipe(debounceTime(150))
       .subscribe(() => {
         this.formState.set(this.filterForm.getRawValue());
         this.emitFilters();

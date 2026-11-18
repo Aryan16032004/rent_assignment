@@ -1,14 +1,12 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   ElementRef,
   computed,
   inject,
   input,
   signal
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   FormControl,
   FormGroup,
@@ -25,7 +23,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { AMENITIES } from '../../../../core/constants/amenities';
-import { HasUnsavedChanges } from '../../../../core/guards/unsaved-changes.guard';
 import {
   Amenity,
   LeaseType,
@@ -59,14 +56,13 @@ import { phoneValidator } from '../../../../shared/validators/phone.validator';
   styleUrl: './listing-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ListingFormComponent implements HasUnsavedChanges {
+export class ListingFormComponent {
   private readonly listingService = inject(ListingService);
   private readonly draftService = inject(ListingDraftService);
   private readonly authService = inject(AuthService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  private readonly destroyRef = inject(DestroyRef);
   private readonly el = inject(ElementRef);
 
   readonly id = input<string, string | undefined>('', {
@@ -196,7 +192,6 @@ export class ListingFormComponent implements HasUnsavedChanges {
     }
 
     this.form.controls.description.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((val) => {
         this.descCharCount.set(val?.length ?? 0);
       });
@@ -206,9 +201,14 @@ export class ListingFormComponent implements HasUnsavedChanges {
     if (listingId) {
       this.listingService
         .getById(listingId)
-        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe((listing) => {
           if (listing) {
+            const currentUser = this.authService.currentUser();
+            if (currentUser && listing.ownerId !== currentUser.id) {
+              this.toastService.error('You do not have permission to edit this listing.');
+              void this.router.navigate(['/']);
+              return;
+            }
             this.prefillForm(listing);
           }
         });
@@ -341,7 +341,6 @@ export class ListingFormComponent implements HasUnsavedChanges {
     if (this.isEditMode()) {
       this.listingService
         .update(this.id(), payload)
-        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (updated) => {
             this.toastService.success('Listing updated successfully!');
@@ -366,7 +365,6 @@ export class ListingFormComponent implements HasUnsavedChanges {
 
       this.listingService
         .create(fullListing)
-        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (created) => {
             this.toastService.success('Listing published successfully!');

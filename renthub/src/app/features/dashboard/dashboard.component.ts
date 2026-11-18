@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -19,22 +18,18 @@ import { AuthService } from '../../core/services/auth.service';
 export class DashboardComponent {
   private readonly dashboardService = inject(DashboardService);
   private readonly authService = inject(AuthService);
-  private readonly destroyRef = inject(DestroyRef);
 
   readonly user = this.authService.currentUser;
   readonly data = signal<DashboardData | null>(null);
   readonly isLoading = signal(true);
 
   ngOnInit(): void {
-    this.dashboardService
-      .getDashboard()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (data) => {
-          this.data.set(data);
-          this.isLoading.set(false);
-        },
-        error: () => this.isLoading.set(false)
-      });
+    this.dashboardService.getDashboard().subscribe({
+      next: (data) => {
+        this.data.set(data);
+        this.isLoading.set(false);
+      },
+      error: () => this.isLoading.set(false)
+    });
   }
 }

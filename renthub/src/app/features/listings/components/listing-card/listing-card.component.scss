@@ -1,7 +1,19 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
 .listing-card {
   display: flex;
   flex-direction: column;
+  width: 100%;
   height: 100%;
+  box-sizing: border-box;
+  min-width: 0;
   border-radius: 18px !important;
   overflow: hidden;
   background: #ffffff;

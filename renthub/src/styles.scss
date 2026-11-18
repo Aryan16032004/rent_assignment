@@ -2,6 +2,10 @@
 
 html {
   min-height: 100%;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
   scroll-behavior: smooth;
   @include mat.theme(
     (
@@ -16,6 +20,9 @@ html {
 }
 
 body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
   color-scheme: light;
   background: linear-gradient(180deg, #f0f7ff 0%, #f8fafc 350px, #f8fafc 100%);
   color: #0f172a;

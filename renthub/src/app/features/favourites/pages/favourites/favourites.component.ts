@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -20,7 +19,6 @@ import { ListingService } from '../../../../core/services/listing.service';
 export class FavouritesComponent {
   private readonly listingService = inject(ListingService);
   private readonly authService = inject(AuthService);
-  private readonly destroyRef = inject(DestroyRef);
 
   readonly listings = signal<Listing[]>([]);
   readonly isLoading = signal(true);
@@ -38,15 +36,12 @@ export class FavouritesComponent {
     }
 
     this.isLoading.set(true);
-    this.listingService
-      .getFavourites(user.id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (items) => {
-          this.listings.set(items);
-          this.isLoading.set(false);
-        },
-        error: () => this.isLoading.set(false)
-      });
+    this.listingService.getFavourites(user.id).subscribe({
+      next: (items) => {
+        this.listings.set(items);
+        this.isLoading.set(false);
+      },
+      error: () => this.isLoading.set(false)
+    });
   }
 }

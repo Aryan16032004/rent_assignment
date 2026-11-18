@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -22,7 +21,6 @@ type StatusTab = 'all' | ListingStatus;
 export class MyListingsComponent {
   private readonly listingService = inject(ListingService);
   private readonly toastService = inject(ToastService);
-  private readonly destroyRef = inject(DestroyRef);
 
   readonly listings = signal<Listing[]>([]);
   readonly isLoading = signal(true);
@@ -55,30 +53,24 @@ export class MyListingsComponent {
 
   load(): void {
     this.isLoading.set(true);
-    this.listingService
-      .getMine()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (items) => {
-          this.listings.set(items);
-          this.isLoading.set(false);
-        },
-        error: () => this.isLoading.set(false)
-      });
+    this.listingService.getMine().subscribe({
+      next: (items) => {
+        this.listings.set(items);
+        this.isLoading.set(false);
+      },
+      error: () => this.isLoading.set(false)
+    });
   }
 
   updateStatus(listing: Listing, status: ListingStatus): void {
-    this.listingService
-      .updateStatus(listing.id, status)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (updated) => {
-          this.listings.update((items) =>
-            items.map((item) => (item.id === updated.id ? updated : item))
-          );
-          this.toastService.success(`Listing marked as ${status}.`);
-        }
-      });
+    this.listingService.updateStatus(listing.id, status).subscribe({
+      next: (updated) => {
+        this.listings.update((items) =>
+          items.map((item) => (item.id === updated.id ? updated : item))
+        );
+        this.toastService.success(`Listing marked as ${status}.`);
+      }
+    });
   }
 
   deleteListing(listing: Listing): void {
@@ -86,14 +78,11 @@ export class MyListingsComponent {
       return;
     }
 
-    this.listingService
-      .delete(listing.id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.listings.update((items) => items.filter((item) => item.id !== listing.id));
-          this.toastService.success('Listing deleted successfully.');
-        }
-      });
+    this.listingService.delete(listing.id).subscribe({
+      next: () => {
+        this.listings.update((items) => items.filter((item) => item.id !== listing.id));
+        this.toastService.success('Listing deleted successfully.');
+      }
+    });
   }
 }

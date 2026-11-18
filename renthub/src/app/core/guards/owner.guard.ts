@@ -1,41 +1,31 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { catchError, map, of } from 'rxjs';
+import { map } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { ListingService } from '../services/listing.service';
 
 /**
- * Functional Route Owner Guard
- * Protects listing modification routes (`/listings/:id/edit`).
- * Verifies that the authenticated user is the designated owner (`ownerId`) of the listing.
- * Redirects non-owners or missing listings to home (`/`).
+ * Owner Guard
+ * Ensures only the landlord who created the listing can access the edit page.
  */
 export const ownerGuard: CanActivateFn = (route) => {
-  const listingService = inject(ListingService);
   const authService = inject(AuthService);
+  const listingService = inject(ListingService);
   const router = inject(Router);
+
   const listingId = route.paramMap.get('id');
+  const user = authService.currentUser();
 
-  if (!listingId) {
-    return router.createUrlTree(['/']);
+  if (!user || !listingId) {
+    return router.createUrlTree(['/login']);
   }
 
-  const currentUser = authService.currentUser();
-  if (!currentUser) {
-    return router.createUrlTree(['/login'], {
-      queryParams: { returnUrl: `/listings/${listingId}/edit` }
-    });
-  }
-
-  // Fetch listing and verify ownership matches current user ID
   return listingService.getById(listingId).pipe(
-    catchError(() => of(null)),
     map((listing) => {
-      if (!listing) {
-        return router.createUrlTree(['/']);
+      if (listing && listing.ownerId === user.id) {
+        return true;
       }
-
-      return listing.ownerId === currentUser.id ? true : router.createUrlTree(['/']);
+      return router.createUrlTree(['/']);
     })
   );
 };

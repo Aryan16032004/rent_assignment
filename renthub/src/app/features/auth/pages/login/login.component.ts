@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -11,6 +10,10 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ToastService } from '../../../../core/services/toast.service';
 
+/**
+ * Login Component
+ * Uses standard Angular Reactive Forms with required & email validation.
+ */
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -32,7 +35,6 @@ export class LoginComponent {
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  private readonly destroyRef = inject(DestroyRef);
 
   readonly hidePassword = signal(true);
   readonly submitError = signal<string | null>(null);
@@ -49,10 +51,9 @@ export class LoginComponent {
     })
   });
 
-  private readonly formStatus = toSignal(this.form.statusChanges, {
-    initialValue: this.form.status
-  });
-  readonly isSubmitDisabled = computed(() => this.formStatus() !== 'VALID' || this.isSubmitting());
+  isSubmitDisabled(): boolean {
+    return this.form.invalid || this.isSubmitting();
+  }
 
   submit(): void {
     this.submitError.set(null);
@@ -70,7 +71,6 @@ export class LoginComponent {
 
     this.authService
       .login(email, password)
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.toastService.success('Welcome back to RentHub.');

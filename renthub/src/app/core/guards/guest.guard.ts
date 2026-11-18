@@ -3,19 +3,15 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 /**
- * Functional Route Guest Guard
- * Restricts access to guest-only routes (e.g., `/login`, `/register`).
- * Redirects already authenticated users to the home dashboard (`/`).
+ * Guest Guard
+ * Prevents logged-in users from visiting /login or /register, redirecting them to home.
  */
 export const guestGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  // Allow navigation only if visitor is not logged in
-  if (!authService.isLoggedIn()) {
-    return true;
+  if (authService.isLoggedIn()) {
+    return router.createUrlTree(['/']);
   }
-
-  // Redirect authenticated user to homepage
-  return router.createUrlTree(['/']);
+  return true;
 };

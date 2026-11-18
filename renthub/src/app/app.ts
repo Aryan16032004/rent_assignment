@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 
@@ -12,15 +11,11 @@ import { filter } from 'rxjs';
 })
 export class AppComponent {
   private readonly router = inject(Router);
-  private readonly destroyRef = inject(DestroyRef);
   private previousPath = '';
 
   constructor() {
     this.router.events
-      .pipe(
-        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-        takeUntilDestroyed(this.destroyRef)
-      )
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe((event) => {
         const currentPath = event.urlAfterRedirects.split('?')[0];
         if (this.previousPath && this.previousPath !== currentPath) {

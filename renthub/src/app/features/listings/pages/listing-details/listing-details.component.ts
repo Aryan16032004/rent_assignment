@@ -1,13 +1,11 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   computed,
   inject,
   input,
   signal
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -58,7 +56,6 @@ export class ListingDetailsComponent {
   private readonly toastService = inject(ToastService);
   private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
-  private readonly destroyRef = inject(DestroyRef);
 
   readonly id = input.required<string>();
 
@@ -106,7 +103,6 @@ export class ListingDetailsComponent {
     this.isLoading.set(true);
     this.listingService
       .getById(this.id())
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
           this.listing.set(res);
@@ -121,7 +117,6 @@ export class ListingDetailsComponent {
   loadComments(): void {
     this.commentService
       .getForListing(this.id())
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (comments) => this.comments.set(Array.isArray(comments) ? comments : [])
       });
@@ -153,7 +148,6 @@ export class ListingDetailsComponent {
     this.isPostingComment.set(true);
     this.commentService
       .add(this.id(), this.commentControl.value, this.replyTo()?.id ?? null)
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (comment) => {
           this.comments.update((items) => [...items, comment]);
@@ -173,7 +167,6 @@ export class ListingDetailsComponent {
 
     this.commentService
       .delete(comment.id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.comments.update((items) =>
@@ -229,7 +222,6 @@ export class ListingDetailsComponent {
 
     this.favouriteService
       .toggleFavourite(user.id, l.id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((isFav) => {
         this.toastService.success(
           isFav ? 'Added to favourites!' : 'Removed from favourites.'
@@ -269,7 +261,6 @@ export class ListingDetailsComponent {
 
     this.listingService
       .delete(this.id())
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.toastService.success('Listing deleted successfully.');
